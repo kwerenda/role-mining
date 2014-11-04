@@ -126,7 +126,7 @@ def main():
 
 if __name__ == '__main__':
     print("hello!")
-    getMany()
+    # getMany()
     # removeOnes("datasets/cit-HepTh/cit-HepTh-dates.txt")
-    # readGraph("datasets/cit-HepTh/cit-HepTh.txt", "datasets/cit-HepTh/cit-HepTh-dates-cleaned.txt")
+    readGraph("datasets/cit-HepTh/cit-HepTh.txt", "datasets/cit-HepTh/cit-HepTh-dates-cleaned.txt")
     print("bye!")
