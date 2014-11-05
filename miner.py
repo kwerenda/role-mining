@@ -29,6 +29,64 @@ def detect_comunities_in_timeslots():
         detect_comunities(year, g)
 
 
+def clean_data(filename_edges, filename_dates):
+
+    # read raw
+    with open(filename_dates) as fnodes:
+        nodes = [line.strip() for line in fnodes.readlines() if not line.startswith('#')]
+    print "Raw nodes with dates: ", len(nodes)
+
+    with open(filename_edges) as fedges:
+        edges = [line.strip() for line in fedges.readlines() if not line.startswith('#')]
+    print "Raw edges: ", len(edges)
+
+    #   remove 11s
+    nodes_without_11s = []
+    s11 = 0
+    for node in nodes:
+        node_id, date = node.split()
+        node_id = node_id.lstrip('0')
+        date = datetime.strptime(date, DATE_FORMAT)
+        if node_id.startswith('11'):
+            if len(node_id) >= 7 or len(node_id) == 6 and date.year == 2000:
+                s11 += 1
+                node_id = node_id[2:].rjust(7, '0')
+                nodes_without_11s.append(node_id + "\t" + node.split()[1])
+        else:
+            nodes_without_11s.append(node)
+    removed = len(nodes) - len(nodes_without_11s)
+    nodes = nodes_without_11s
+    print "Nodes after removing 11s: ", len(nodes), " removed: ", removed, " affected: ", s11
+
+    # search for duplicate or inconsitent dates
+    different_date = 0
+    duplicates = 0
+    dates = {}  # {node_id : date}
+    for node in nodes:
+        [node_id, date] = node.split()
+        date = datetime.strptime(date, DATE_FORMAT)
+        node_id = int(node_id)
+        if node_id in dates:
+            duplicates += 1
+            if dates[node_id] != date:
+                # print "Different date for node: {}! In dict: {}, read: {}".format(node_id, dates[node_id], date)
+                dates[node_id] = min(date, dates[node_id])
+                different_date += 1
+        else:
+            dates[node_id] = date
+
+    print "Nodes after removing duplicates: {} Removed: {}, duplicates: {}, inconsistencies: {}"\
+        .format(len(dates.keys()), len(nodes) - len(dates.keys()), duplicates, different_date)
+
+    with open(filename_dates.replace('.txt', '') + '-cleaned-dupl.txt', 'w') as fout:
+        for node in nodes:
+            fout.write(node + "\n")
+
+
+
+
+
+
 def rewrite_dates_without_ones(filename):
     """Rewrite all entries to new file without leading 11s in ids"""
     with open(filename) as f, open(filename.replace('.txt', '') + '-cleaned.txt', 'w') as fout:
@@ -170,7 +228,8 @@ if __name__ == '__main__':
     print("hello!")
     # getMany()
     # removeOnes("datasets/cit-HepTh/cit-HepTh-dates.txt")
-    split_to_time_slots("datasets/cit-HepTh/cit-HepTh.txt", "datasets/cit-HepTh/cit-HepTh-dates-cleaned.txt")
+    # split_to_time_slots("datasets/cit-HepTh/cit-HepTh.txt", "datasets/cit-HepTh/cit-HepTh-dates-cleaned.txt")
+    clean_data("datasets/cit-HepTh/cit-HepTh.txt", "datasets/cit-HepTh/cit-HepTh-dates.txt")
     print("bye!")
 
 
