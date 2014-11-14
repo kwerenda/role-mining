@@ -4,7 +4,7 @@
 
 import numpy as np
 import pylab as P
-import HepReader
+from HepReader import HepReader
 from datetime import datetime
 from sys import stdout
 
@@ -23,14 +23,11 @@ def get_edges_per_slot():
 
 if __name__ == "__main__":
 
-
-    dates = HepReader.read_dates("/Users/bogna/dev/role-mining/datasets/cit-HepTh/cit-HepTh-dates-cleaned-dupl.txt")
+    dates = HepReader.read_dates("/Users/bogna/dev/role-mining/datasets/cit-HepTh/cit-HepTh-dates.nodes")
     edges = HepReader.read_edges("/Users/bogna/dev/role-mining/datasets/cit-HepTh/cit-HepTh.txt")
 
     lens = []
     for edge in edges:
-        HepReader._get_year(edge[0], dates, stdout)
-        HepReader._get_year(edge[1], dates, stdout)
         dateSource = dates[edge[0]]
         dateDest = dates[edge[0]]
         lens.append((dateSource - dateDest).total_seconds()/60*60*24)
@@ -96,11 +93,6 @@ if __name__ != "__main__":
     # bins = [100, 125, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 275, 300]
     # n, bins, patches = P.hist(x)#, bins) #, bins, histtype='bar')
     # P.show()
-
-
-
-
-
 
 
     #

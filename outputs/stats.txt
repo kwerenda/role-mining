@@ -1,13 +1,8 @@
 38'557      publikacji z datami (węzłów w pliku z datami)
 35'494      po usunięciu  3063 duplikatów, w tym 2839 różniących się datami - wybrano wcześniejsze
 6'683       cross citations (11s)
-352'807     krawędzi (cytowań)
-14'167      Węzły występujące w edges, ale nie w pliku z datami:
 287         Węzły z przypisną inną datą, niż ta która by wynikał z ich id
-
-Nodes	27'770
-Edges	352'807
-
-nodes: 27'770
-
-
+352'807     krawędzi (cytowań), 0 duplikatów
+27'770      Węzłów pojawiających się w edges
+16'326      Węzły występujące w edges, ale nie w pliku z datami
+24'050      Węzłów ze zdefiniowaną datą, ale bez krawędzi
