@@ -1,7 +1,5 @@
 from src.HepReader import HepReader
 
-__author__ = 'bogna'
-
 if __name__ == '__main__':
     hp = HepReader()
     hp.clean_data("datasets/cit-HepTh/cit-HepTh.txt", "datasets/cit-HepTh/cit-HepTh-dates.txt", write_to_file=False)
