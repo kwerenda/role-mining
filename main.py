@@ -1,6 +1,6 @@
-__author__ = 'bogna'
+from src.HepReader import HepReader
 
-from HepReader import HepReader
+__author__ = 'bogna'
 
 if __name__ == '__main__':
     hp = HepReader()

@@ -2,16 +2,16 @@
 
 # -*- coding: utf-8 -*-
 
-import numpy as np
-import pylab as P
-from HepReader import HepReader
 from datetime import datetime
-from sys import stdout
+
+import pylab as P
+
 
 
 # liczba krawedzi per timeslot -> wykres
 
 # plik ze wszystkimi datami
+from src import HepReader
 
 
 def get_edges_per_slot():

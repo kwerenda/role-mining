@@ -1,6 +1,7 @@
 from unittest import TestCase
-from HepReader import HepReader
 from datetime import date
+
+from src.HepReader import HepReader
 
 
 class TestHepReader(TestCase):
