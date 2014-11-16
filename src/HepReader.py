@@ -7,11 +7,38 @@ from itertools import chain
 
 
 class HepReader(object):
-    def __init__(self):
+    def __init__(self, filename_edges, filename_dates):
         self._stripped_11s = 0
+        self._filename_edges = filename_edges
+        self._filename_dates = filename_dates
+        self.edges = self.read_edges(self._filename_edges)
+        self.dates = self.read_dates(self._filename_dates)
         pass
 
     DATE_FORMAT = '%Y-%m-%d'
+
+
+    def detect_communities(self):
+
+        g = snap.LoadEdgeList(snap.PUNGraph, self._filename_edges)
+        # g = snap.TNGraph()
+
+        connected_components_CNM = snap.TCnComV()
+        modularity_CNM = snap.CommunityCNM(g, connected_components_CNM)
+        # for community in connected_components_CNM:
+        #     print "Community:"
+        #     for ni in community:
+        #         print ni
+        print "The CNM modularity of the network is %f" % modularity_CNM
+
+        connected_components_GN = snap.TCnComV()
+        modularity_GN = snap.CommunityGirvanNewman(g, connected_components_GN)
+        print "The GN modularity of the network is %f" % modularity_GN
+
+
+
+
+
 
 
     @staticmethod
@@ -30,15 +57,15 @@ class HepReader(object):
                 self._stripped_11s += 1
         return node_id
 
-    def clean_data(self, filename_edges, filename_dates, write_to_file=False):
+    def clean_data(self, write_to_file=False):
         """Read data from raw file, remove 11s and duplicates, optionally write results to new file"""
         # read raw file line by line
-        with open(filename_dates) as fnodes:
+        with open(self._filename_dates) as fnodes:
             nodes = [line.strip().split() for line in fnodes.readlines() if not line.startswith('#')]
         print "Raw nodes with dates: ", len(nodes)
 
-        edges = self.read_edges(filename_edges)
-        print "Raw edges: ", len(edges)
+
+        print "Raw edges: ", len(self.edges)
 
         # remove 11s
         cleaned_nodes = []
@@ -69,8 +96,8 @@ class HepReader(object):
         print "Nodes after removing duplicates: {} Removed: {}, duplicates: {}, inconsistencies: {}" \
             .format(len(dates.keys()), len(nodes) - len(dates.keys()), duplicates, different_date)
 
-        nr_edges_raw = len(edges)
-        edges = list(set([(int(e[0]), (e[1])) for e in edges]))
+        nr_edges_raw = len(self.edges)
+        edges = list(set([(int(e[0]), (e[1])) for e in self.edges]))
         print "Removed duplicate edges: {}".format(nr_edges_raw - len(edges))
 
         # check for inconsistencies between id and date
@@ -84,7 +111,7 @@ class HepReader(object):
 
         # print results to "cleaned" file
         if write_to_file:
-            with open(filename_dates.replace('.txt', '') + '-cleaned.txt', 'w') as fout:
+            with open(self._filename_dates.replace('.txt', '') + '-cleaned.txt', 'w') as fout:
                 for node_id, cit_date in sorted(dates.iteritems(), key=lambda e: e[1]):
                     fout.write("{:07d}\t{}\n".format(node_id, cit_date))
                 print "Written to ", fout.name
@@ -102,8 +129,9 @@ class HepReader(object):
         print "Number of nodes with date but no edges", len(nodes_with_date_but_no_edges)
 
         #print only nodes with edges to separate file, correct date if possible
+        new_nodes_filename = self._filename_dates.replace('.txt', '.nodes')
         if write_to_file:
-            with open(filename_dates.replace('.txt', '.nodes'), 'w') as fout:
+            with open(new_nodes_filename, 'w') as fout:
                 for node_id in sorted(nodes_with_edges):
                     try:
                         node_date = dates[node_id]
@@ -112,6 +140,9 @@ class HepReader(object):
                     fout.write("{:07d}\t{}\n".format(node_id, node_date))
 
                 print "Nodes with dates writen to ", fout.name
+                return fout.name
+        return new_nodes_filename
+
 
 
     @classmethod
@@ -138,11 +169,10 @@ class HepReader(object):
                 edges.append((int(source_node), int(dest_node)))
         return edges
 
-    @staticmethod
-    def split_to_timeslots(dates, edges, timeslots):
+    def split_to_timeslots(self,timeslots):
         slots = defaultdict(list)  # {slot : [edges]}
-        for edge in edges:
-            date_e = dates[edge[0]]
+        for edge in self.edges:
+            date_e = self.dates[edge[0]]
             # find slot
             i = 0
             n_slots = len(timeslots)
@@ -151,10 +181,9 @@ class HepReader(object):
             slots[timeslots[i - 1]].append(edge)
         return slots
 
-    @classmethod
-    def split_by_year(cls, dates, edges, write_to_file=False, base_filename=""):
+    def split_by_year(self, write_to_file=False, base_filename=""):
         years = [date(year=y, month=01, day=01) for y in range(1992, 2004)]
-        slots = cls.split_to_timeslots(dates, edges, years)
+        slots = self.split_to_timeslots(years)
         lines = 0
         if write_to_file:
             for year in slots:
