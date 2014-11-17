@@ -5,13 +5,8 @@
 from datetime import datetime
 
 import pylab as P
-
-
-
-# liczba krawedzi per timeslot -> wykres
-
-# plik ze wszystkimi datami
-from src import HepReader
+from src.HepReader import HepReader
+from src.RoleMining import RoleMining
 
 
 def get_edges_per_slot():
@@ -21,7 +16,25 @@ def get_edges_per_slot():
 
     return slots
 
-if __name__ == "__main__":
+def plot_community_size_distribution():
+    for year in [1992, 2002, 2003]:
+    # for year in range(1992, 2004):
+        P.figure()
+        hp = HepReader.get_for_year(year)
+        rm = RoleMining(hp.get_nodes(), hp.get_edges())
+        sizes_of_communities = [len(c) for c in rm.communities.values()]
+        P.hist(sizes_of_communities, label=str(year), alpha=0.9)
+        P.xlabel("Size of community [members]")
+        P.ylabel("Number of communities")
+        P.suptitle("Year {}\nNon-overlapping community size distribution".format(year))
+
+        # P.yscale('log')
+    # P.legend()
+
+    P.show()
+
+
+def plot_citat_age():
 
     dates = HepReader.read_dates("/Users/bogna/dev/role-mining/datasets/cit-HepTh/cit-HepTh-dates.nodes")
     edges = HepReader.read_edges("/Users/bogna/dev/role-mining/datasets/cit-HepTh/cit-HepTh.txt")
@@ -34,10 +47,11 @@ if __name__ == "__main__":
     print lens
 
     P.hist(lens, bins=10, histtype='bar')
+
     P.show()
 
 
-if __name__ != "__main__":
+def plot_smth():
     # P.style.xkcd()
     # slots = get_edges_per_slot()
     minyear = 1992
@@ -118,3 +132,6 @@ if __name__ != "__main__":
     # n, bins, patches = P.hist(x, bins, normed=1, histtype='bar', rwidth=0.8)
     #
     # P.show()
+
+if __name__ == "__main__":
+    plot_community_size_distribution()

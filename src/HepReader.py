@@ -6,37 +6,38 @@ from collections import defaultdict
 from itertools import chain
 
 
+class Node(object):
+    def __init__(self, nid, ndate, communities):
+        self.nid = nid
+        self.communities = communities
+        self.ndate = ndate
+        self.role = None
+
+
 class HepReader(object):
-    def __init__(self, filename_edges, filename_dates):
+    def __init__(self, filename_edges, filename_dates, filename_communities):
         self._stripped_11s = 0
         self._filename_edges = filename_edges
         self._filename_dates = filename_dates
         self.edges = self.read_edges(self._filename_edges)
         self.dates = self.read_dates(self._filename_dates)
+        self.communities = self.read_communities(filename_communities)
         pass
 
     DATE_FORMAT = '%Y-%m-%d'
 
+    def get_edges(self):
+        return self.edges
 
-    def detect_communities(self):
+    def get_nodes(self):
+        """Return nodes as list of Node objects with dates and communities"""
+        return {node_id: Node(node_id, self.dates[node_id], self.communities[node_id]) for node_id in self.dates}
 
-        g = snap.LoadEdgeList(snap.PUNGraph, self._filename_edges)
-        # g = snap.TNGraph()
-
-        connected_components_CNM = snap.TCnComV()
-        modularity_CNM = snap.CommunityCNM(g, connected_components_CNM)
-        # for community in connected_components_CNM:
-        #     print "Community:"
-        #     for ni in community:
-        #         print ni
-        print "The CNM modularity of the network is %f" % modularity_CNM
-
-        connected_components_GN = snap.TCnComV()
-        modularity_GN = snap.CommunityGirvanNewman(g, connected_components_GN)
-        print "The GN modularity of the network is %f" % modularity_GN
-
-
-
+    @staticmethod
+    def get_for_year(year):
+        return HepReader("datasets/cit-HepTh/split/cit-HepTh-{}.edges".format(year),
+                   "datasets/cit-HepTh/cit-HepTh-dates.nodes",
+                   "datasets/cit-HepTh/split/cit-HepTh-{}.communities".format(year))
 
 
 
@@ -168,6 +169,19 @@ class HepReader(object):
                 [source_node, dest_node] = line.split()
                 edges.append((int(source_node), int(dest_node)))
         return edges
+
+    @classmethod
+    def read_communities(cls, filename):
+        """Read nodes with communities from file as dict: {node_id : [community_id]}"""
+        communities = defaultdict(list)
+        with open(filename) as f:
+            for line in f:
+                if line.startswith('#'):
+                    continue
+                [node_id, community] = line.split()
+                communities[int(node_id)].append(int(community))
+        return communities
+
 
     def split_to_timeslots(self,timeslots):
         slots = defaultdict(list)  # {slot : [edges]}

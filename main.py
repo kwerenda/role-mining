@@ -5,15 +5,15 @@ import os
 
 if __name__ == '__main__':
 
-    base = "/Users/bogna/dev/role-mining/datasets/cit-HepTh/split/cit-HepTh-"
-    for year in range(1994, 2004):
-        filename = base + "{}[Nodes].csv".format(year)
-        print year
-        os.rename(filename, base + "{}.communities".format(year))
 
+    hp = HepReader.get_for_year(1992)
+    nodes = hp.get_nodes()
+    edges = hp.get_edges()
 
+    rm = RoleMining(nodes, edges)
 
-        # hp = HepReader("/Users/bogna/dev/role-mining/datasets/cit-HepTh/split/cit-HepTh-{}.edges".format(year), "/Users/bogna/dev/role-mining/datasets/cit-HepTh/cit-HepTh-dates.nodes")
+    rm.find_outsiders()
+
         # hp.detect_communities()
     # g = snap.TNGraph( hp.edges)
     # for NI in g.Nodes():
