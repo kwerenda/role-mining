@@ -33,6 +33,11 @@ class HepReader(object):
         """Return nodes as list of Node objects with dates and communities"""
         return {node_id: Node(node_id, self.dates[node_id], self.communities[node_id]) for node_id in self.dates}
 
+    def get_nodes_from_edges_only(self):
+        used_nodes = set(chain(*self.edges))
+        return {node_id: Node(node_id, self.dates[node_id], self.communities[node_id])
+                for node_id in self.dates if node_id in used_nodes}
+
     @staticmethod
     def get_for_year(year):
         return HepReader("datasets/cit-HepTh/split/cit-HepTh-{}.edges".format(year),
