@@ -11,7 +11,7 @@ class Node(object):
         self.nid = nid
         self.communities = communities
         self.ndate = ndate
-        self.role = None
+        self.roles = dict()
 
 
 class HepReader(object):

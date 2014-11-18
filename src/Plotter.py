@@ -8,6 +8,8 @@ import pylab as P
 from src.HepReader import HepReader
 from src.RoleMining import RoleMining
 
+from collections import Counter
+
 
 def get_edges_per_slot():
     slots = {} # {year : edges}
@@ -17,19 +19,26 @@ def get_edges_per_slot():
     return slots
 
 def plot_community_size_distribution():
-    for year in [1992, 2002, 2003]:
+
+    for year in range(1992, 1995):
     # for year in range(1992, 2004):
         P.figure()
+
         hp = HepReader.get_for_year(year)
         rm = RoleMining(hp.get_nodes(), hp.get_edges())
         sizes_of_communities = [len(c) for c in rm.communities.values()]
-        P.hist(sizes_of_communities, label=str(year), alpha=0.9)
+        size_dist = Counter(sizes_of_communities)
+        x = sorted(size_dist.keys())
+        y = [size_dist[v] for v in x]
+
+
+        P.bar(x, y, align='center', color='b')
+        # P.hist(sizes_of_communities, label=str(year), alpha=0.9)
         P.xlabel("Size of community [members]")
         P.ylabel("Number of communities")
         P.suptitle("Year {}\nNon-overlapping community size distribution".format(year))
+        # P.xscale('log')
 
-        # P.yscale('log')
-    # P.legend()
 
     P.show()
 

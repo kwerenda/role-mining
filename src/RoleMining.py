@@ -18,7 +18,7 @@ class RoleMining(object):
     def __init__(self, nodes, edges):
         self.nodes = nodes
         self.edges = edges
-        self.communities = defaultdict(list)
+        self.communities = defaultdict(list) # {com_id : lista nodow}
         for node in self.nodes.values():
             for c in node.communities:
                 self.communities[c].append(node)
@@ -30,13 +30,17 @@ class RoleMining(object):
 
     def create_communities_graphs(self):
         """Creates snap graphs from communities. Only edges between members of same commmunities are preserved"""
+        pass
+        # tu tworz graph-tool graf
 
     def calculate_betweenness_centrality(self):
         pass
 
     def caluculate_centrality(self):
-        CloseCentr = snap.GetClosenessCentr(UGraph, NI.GetId())
-        print "node: %d centrality: %f" % (NI.GetId(), CloseCentr)
+        pass
+        # for all communities
+        # CloseCentr = snap.GetClosenessCentr(UGraph, NI.GetId())
+        # print "node: %d centrality: %f" % (NI.GetId(), CloseCentr)
 
     def find_outsiders(self):
         for comm in sorted(self.communities.values(), key=len):
