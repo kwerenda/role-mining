@@ -9,6 +9,7 @@ from src.HepReader import HepReader
 from src.RoleMining import RoleMining
 
 from collections import Counter
+from itertools import ifilter
 
 
 def get_edges_per_slot():
@@ -18,28 +19,58 @@ def get_edges_per_slot():
 
     return slots
 
+
+def autolabel(rects):
+    """attach some text labels"""
+    for rect in rects:
+        height = rect.get_height()
+        P.text(rect.get_x()+rect.get_width()/2., 1.05*height, '%d' % int(height),
+               ha='center', va='bottom')
+
+
+
 def plot_community_size_distribution():
 
-    for year in range(1992, 1995):
+    sizes = Counter()
+    all_sizes = []
+    for year in range(1992, 2004):
     # for year in range(1992, 2004):
-        P.figure()
+    #     P.figure()
 
         hp = HepReader.get_for_year(year)
         rm = RoleMining(hp.get_nodes(), hp.get_edges())
         sizes_of_communities = [len(c) for c in rm.communities.values()]
-        size_dist = Counter(sizes_of_communities)
-        x = sorted(size_dist.keys())
-        y = [size_dist[v] for v in x]
+        all_sizes.extend(sizes_of_communities)
+        counted = Counter(sizes_of_communities)
+        sizes += counted
+
+    # years = 2004 - 1992
+    # x = sorted(sizes.keys())
+    min_size = 10
+    max_size = max(all_sizes)
+    # x = x[min_size:]
+    # y = [sizes[v] for v in x]
+    # stds = [sizes[i]/years for i in x]
+    #
+    year = "overall"
 
 
-        P.bar(x, y, align='center', color='b')
-        # P.hist(sizes_of_communities, label=str(year), alpha=0.9)
-        P.xlabel("Size of community [members]")
-        P.ylabel("Number of communities")
-        P.suptitle("Year {}\nNon-overlapping community size distribution".format(year))
-        # P.xscale('log')
+    P.xlabel("Size of community [members]")
+    P.ylabel("Number of communities")
+    P.suptitle("Year {}, communities bigger than 10 members\nNon-overlapping community size distribution".format(year))
+        # P.yscale('log',  nonposy='clip')
 
 
+
+
+    # bars = P.bar(x, y, align='center', color="m", yerr=stds, alpha=0.8)
+
+
+    n, bins, patches = P.hist(filter(lambda x: x > min_size, all_sizes))
+    autolabel(patches)
+    # autolabel(bars)
+    P.xticks([min_size] + range(min_size-10, max_size + 1, 100) )
+    P.xlim(min_size, max_size)
     P.show()
 
 
