@@ -1,6 +1,5 @@
 from src.HepReader import HepReader
 from src.RoleMining import RoleMining
-import snap
 import os
 
 if __name__ == '__main__':

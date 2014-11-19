@@ -3,6 +3,7 @@ from HepReader import HepReader
 from graph_tool.all import *
 from collections import Counter
 import pylab as P
+from math import isnan
 
 class Network(object):
     def __init__(self, edges, nodes):
@@ -39,6 +40,7 @@ class Network(object):
 
         return g, label2index, label, community
 
+
 def filter_community(community_label, community_pmap, g):
     in_group = g.new_vertex_property("bool")
     for v in g.vertices():
@@ -48,40 +50,123 @@ def filter_community(community_label, community_pmap, g):
             in_group[v] = False
     return in_group
 
+
+def plot_hist(data):
+    # P.hist(data, bins=50, range=(0, 1))
+    P.hist(data, bins=50)
+    # P.xscale('log')
+    # P.yscale('log', nonposy='clip')
+
+
+def filtered(data, size):
+    # data = [x for x in data if x != 0]
+    # if len(data) > size:
+    #     data = data[:size]
+    return sorted(data, reverse=True)[:size]
+    # return data
+
+
 if __name__ == '__main__':
 
     hp = HepReader.get_for_year(1997)
-    node s = hp.get_nodes()
+    nodes = hp.get_nodes()
     edges = hp.get_edges()
 
     N = Network(edges, nodes)
 
-    group_filter = filter_community(4, N.communities, N.graph) # hardcode, 4 is the biggest group for 1997
+    # z palca z tmp1997!
+    # c = (4, 665)
+    # c = (46, 117)
+    # c = (7, 262)
+    # c = (58, 91)
+    c = (50, 413)
+
+    community_nr = c[0]
+    comm_size = c[1]
+
+    group_filter = filter_community(community_nr, N.communities, N.graph) # hardcode, 4 is the biggest group for 1997
 
     N.graph.set_vertex_filter(group_filter)
 
-    pagerank = graph_tool.centrality.pagerank(N.graph).get_array().tolist()
-    print "pagerank"
+    # pagerank = graph_tool.centrality.pagerank(N.graph).get_array().tolist()
 
-    size_dist = Counter(pagerank)
-    print size_dist.most_common(50)
+    closeness = graph_tool.centrality.closeness(N.graph).get_array().tolist()
 
-    x = sorted(size_dist.keys())
-    y = [size_dist[v] for v in x]
+    max_eigenval, eigenvec = graph_tool.centrality.eigenvector(N.graph)
+    # eigenvector = [x/max_eigenval for x in eigenvec.get_array().tolist()]  #normalize!
+    eigenvector = eigenvec.get_array().tolist()
 
-    P.figure()
-    P.bar(x, y, align='center')
-    P.xlabel("Size of community [members]")
-    P.ylabel("Number of communities")
-    P.suptitle("Year {}\nNon-overlapping community size distribution".format(1997))
-    P.xscale('log')
-    P.show()
+    betw, _edges = graph_tool.centrality.betweenness(N.graph, norm=True)
+    betweenness = betw.get_array().tolist()
 
 
-    P.figure()
-    P.hist(pagerank)
-    # P.xscale('log')
-    # P.yscale('log')
+    # print "pagerank"
+    # print pagerank
+
+
+
+    # size_dist = Counter(pagerank)
+    # print size_dist.most_common(50)
+    #
+    # x = sorted(size_dist.keys())
+    # y = [size_dist[v] for v in x]
+    #
+
+
+
+
+    P.suptitle("Centrality measures for community nr {} in 1997".format(community_nr))
+    # P.figure()
+
+    #CZYM JEST NAN W CLOSENESS?
+
+    closeness = [0 if isnan(x) else x for x in closeness]
+    closeness = filtered(closeness, comm_size)
+    print "closeness", closeness
+    print "non zeros", len([x for x in closeness if x != 0])
+    P.subplot(2, 2, 1)
+
+    plot_hist(closeness)
+    P.xlabel("Closeness centrality")
+    P.ylabel("Number of nodes (total={})".format(len(closeness)))
+
+    # pagrerank = filtered(pagerank, comm_size)
+    # print "pagerank", pagerank
+    # P.subplot(2, 2, 2)
+    # plot_hist(pagerank)
+    # P.xlabel("Pagerank centrality")
+    # P.ylabel("Number of nodes (total={})".format(len(pagerank)))
+
+    counts, degrees = vertex_hist(N.graph, "in", float_count=False)
+    print "counts : ", len(counts), counts
+    print "degrees: ", len(degrees), degrees
+    counts = list(counts)
+    counts.append(0)
+    P.subplot(2, 2, 2)
+    P.bar(degrees, counts, align='center', color="#348ABD")
+    # P.hist(counts, bins=degrees, )
+    P.xlabel("Degree centrality (in)")
+    P.ylabel("Number of nodes (total={})".format(sum(counts)))
+    P.xlim(0, max(degrees))
+
+    betweenness = filtered(betweenness, comm_size)
+    print "betweenness", betweenness
+    P.subplot(2, 2, 3)
+    plot_hist(betweenness)
+    P.xlabel("Betweenness centrality")
+    P.ylabel("Number of nodes (total={})".format(len(betweenness)))
+
+
+    eigenvector = filtered(eigenvector, comm_size)
+    print "eigenvector", eigenvector
+    P.subplot(2, 2, 4)
+    plot_hist(eigenvector)
+    P.xlabel("Eigenvector centrality")
+    P.ylabel("Number of nodes (total={})".format(len(eigenvector)))
+
+
+
+
     P.show()
 
     # betw, _edges = graph_tool.centrality.betweenness(N.graph)

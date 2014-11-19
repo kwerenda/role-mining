@@ -1,5 +1,4 @@
 
-import snap
 from collections import defaultdict
 from HepReader import Node
 

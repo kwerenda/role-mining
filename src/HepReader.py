@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import snap
+
 from datetime import date, datetime
 from collections import defaultdict
 from itertools import chain
