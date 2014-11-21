@@ -49,7 +49,7 @@ class RoleMining(object):
 
 
 
-        # g = snap.LoadEdgeList(snap.PNGraph, "/Users/bogna/dev/role-mining/datasets/cit-HepTh/split/cit-HepTh-1992.edges", 0, 1, '\t')
+        # g = snap.LoadEdgeList(snap.PNGraph, "/Users/bogna/dev/role-mining/datasets/hepth/timeslots/cit-HepTh-1992.edges", 0, 1, '\t')
         # snap.TNGraph()
         #
         # for NI in g.Nodes():

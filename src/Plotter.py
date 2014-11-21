@@ -15,7 +15,7 @@ from itertools import ifilter
 def get_edges_per_slot():
     slots = {} # {year : edges}
     for year in range(1992, 2004):
-        slots[year] = HepReader.read_edges("datasets/cit-HepTh/split/cit-HepTh-{0}.edges".format(year))
+        slots[year] = HepReader.read_edges("datasets/hepth/timeslots/cit-HepTh-{0}.edges".format(year))
 
     return slots
 
@@ -76,8 +76,8 @@ def plot_community_size_distribution():
 
 def plot_citat_age():
 
-    dates = HepReader.read_dates("/Users/bogna/dev/role-mining/datasets/cit-HepTh/cit-HepTh-dates.nodes")
-    edges = HepReader.read_edges("/Users/bogna/dev/role-mining/datasets/cit-HepTh/cit-HepTh.txt")
+    dates = HepReader.read_dates("/Users/bogna/dev/role-mining/datasets/hepth/cit-HepTh.dates")
+    edges = HepReader.read_edges("/Users/bogna/dev/role-mining/datasets/hepth/cit-HepTh.txt")
 
     lens = []
     for edge in edges:
@@ -104,8 +104,8 @@ def plot_smth():
 
 
     x = sorted(x)
-    dates = HepReader.read_dates("/Users/bogna/dev/role-mining/datasets/cit-HepTh/cit-HepTh-dates-cleaned-dupl.txt")
-    edges = HepReader.read_edges("/Users/bogna/dev/role-mining/datasets/cit-HepTh/cit-HepTh.txt")
+    dates = HepReader.read_dates("/Users/bogna/dev/role-mining/datasets/hepth/cit-HepTh-dates-cleaned-dupl.txt")
+    edges = HepReader.read_edges("/Users/bogna/dev/role-mining/datasets/hepth/cit-HepTh.txt")
     slots = HepReader.split_to_timeslots(dates, edges, x)
     for slot in slots.values():
         print len(slot)

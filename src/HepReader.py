@@ -40,9 +40,9 @@ class HepReader(object):
 
     @staticmethod
     def get_for_year(year):
-        return HepReader("datasets/cit-HepTh/split/cit-HepTh-{}.edges".format(year),
-                   "datasets/cit-HepTh/cit-HepTh-dates.nodes",
-                   "datasets/cit-HepTh/split/cit-HepTh-{}.communities".format(year))
+        return HepReader("datasets/hepth/timeslots/cit-HepTh-{}.edges".format(year),
+                   "datasets/hepth/cit-HepTh.dates",
+                   "datasets/hepth/communities/cit-HepTh-{}.communities".format(year))
 
 
 
