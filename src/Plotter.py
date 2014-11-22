@@ -7,9 +7,83 @@ from datetime import datetime
 import pylab as P
 from src.HepReader import HepReader
 from src.RoleMining import RoleMining
-
 from collections import Counter
-from itertools import ifilter
+from graph_tool import centrality, stats
+from math import isnan
+
+
+def plot_hist(data):
+    # P.hist(data, bins=50, range=(0, 1))
+    P.hist(data, bins=50)
+    # P.xscale('log')
+    # P.yscale('log', nonposy='clip')
+
+
+def filtered(data, size):
+    # data = [x for x in data if x != 0]
+    # if len(data) > size:
+    #     data = data[:size]
+    return sorted(data, reverse=True)[:size]
+    # return data
+
+
+def plot_centralities(network):
+    g = network.graph
+    comm_size = g.num_vertices()
+
+    closeness = centrality.closeness(g).get_array().tolist()
+
+    max_eigenval, eigenvec = centrality.eigenvector(g)
+    # eigenvector = [x/max_eigenval for x in eigenvec.get_array().tolist()]  #normalize!
+    eigenvector = eigenvec.get_array().tolist()
+
+    betw, _edges = centrality.betweenness(g, norm=True)
+    betweenness = betw.get_array().tolist()
+
+
+    P.suptitle("Centrality measures")
+    # P.figure()
+
+
+    print "nans", len([x for x in closeness if isnan(x)])
+    closeness = [0 if isnan(x) else x for x in closeness]
+    # closeness = [x for x in closeness if not isnan(x)]
+    closeness = filtered(closeness, comm_size)
+    print "closeness", closeness
+    print "non zeros", len([x for x in closeness if x != 0])
+    P.subplot(2, 2, 1)
+
+    plot_hist(closeness)
+    P.xlabel("Closeness centrality")
+    P.ylabel("Number of nodes (total={})".format(len(closeness)))
+
+    counts, degrees = stats.vertex_hist(g, "in", float_count=False)
+    print "counts : ", len(counts), counts
+    print "degrees: ", len(degrees), degrees
+    counts = list(counts)
+    counts.append(0)
+    P.subplot(2, 2, 2)
+    P.bar(degrees, counts, align='center', color="#348ABD")
+    # P.hist(counts, bins=degrees, )
+    P.xlabel("Degree centrality (in)")
+    P.ylabel("Number of nodes (total={})".format(sum(counts)))
+    P.xlim(0, max(degrees))
+
+    betweenness = filtered(betweenness, comm_size)
+    print "betweenness", betweenness
+    P.subplot(2, 2, 3)
+    plot_hist(betweenness)
+    P.xlabel("Betweenness centrality")
+    P.ylabel("Number of nodes (total={})".format(len(betweenness)))
+
+    eigenvector = filtered(eigenvector, comm_size)
+    print "eigenvector", eigenvector
+    P.subplot(2, 2, 4)
+    plot_hist(eigenvector)
+    P.xlabel("Eigenvector centrality")
+    P.ylabel("Number of nodes (total={})".format(len(eigenvector)))
+
+    P.show()
 
 
 def get_edges_per_slot():
@@ -26,7 +100,6 @@ def autolabel(rects):
         height = rect.get_height()
         P.text(rect.get_x()+rect.get_width()/2., 1.05*height, '%d' % int(height),
                ha='center', va='bottom')
-
 
 
 def plot_community_size_distribution():

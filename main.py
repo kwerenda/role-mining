@@ -1,21 +1,30 @@
-from src.HepReader import HepReader
-from src.RoleMining import RoleMining
-import os
+from src.Network import Network
+from src.Plotter import plot_centralities
 
 if __name__ == '__main__':
 
+    N1 = Network('datasets/enron/timeslots/10-1999.edges',
+                 'datasets/enron/communities/10-1999.communities')
 
-    hp = HepReader.get_for_year(1992)
-    nodes = hp.get_nodes()
-    edges = hp.get_edges()
+    N2 = Network('datasets/hepth/timeslots/cit-HepTh-1999.edges',
+                 'datasets/hepth/communities/cit-HepTh-1999.communities')
 
-    rm = RoleMining(nodes, edges)
+    print N1.graph.num_vertices(), N1.graph.num_edges()
 
-    rm.find_outsiders()
+    N1.filter_community(16)
 
-        # hp.detect_communities()
-    # g = snap.TNGraph( hp.edges)
-    # for NI in g.Nodes():
-    #          print "node id %d with out-degree %d and in-degree %d" % (
-    #              NI.GetId(), NI.GetOutDeg(), NI.GetInDeg())
+    print N1.graph.num_vertices(), N1.graph.num_edges()
+
+    plot_centralities(N2)
+
+    N1.unfilter_graph()
+
+
+    # hp = HepReader.get_for_year(1992)
+    # nodes = hp.get_nodes()
+    # edges = hp.get_edges()
+    #
+    # rm = RoleMining(nodes, edges)
+    #
+    # rm.find_outsiders()
 
