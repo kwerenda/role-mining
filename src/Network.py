@@ -1,21 +1,30 @@
+from collections import defaultdict, Counter
+from os import listdir
 from graph_tool import Graph
 import csv
 
 
 class Network(object):
-    def __init__(self, edges_file, communities_file):
+    def __init__(self, edges_file, communities_file=None):
         edges = self.read_file(edges_file)
-        communities = self.read_file(communities_file)
+        if communities_file is None:
+            path = edges_file.split('/')
+            path[-2] = 'communities'
+            path[-1] = path[-1][:-6]  # cut off the '.edges' part
+            communities = self.get_communities_from_cf('/'.join(path))
+        else:
+            communities = self.read_file(communities_file)
 
         g, label2index = self.create_graph(edges)
 
         filter_prop = g.new_vertex_property('bool')
         g.vertex_properties['filter'] = filter_prop
 
-        self.create_communities(communities, g, label2index)
+        # self.create_communities(communities, g, label2index)
 
         self.graph = g
         self.label2index = label2index
+        self.communities = self.create_communities(communities)
 
     @classmethod
     def read_file(cls, filename):
@@ -59,24 +68,40 @@ class Network(object):
             graph.vertex_properties["label"][v] = v_label
 
     @classmethod
-    def create_communities(cls, communities_list, g, label2index):
+    def get_communities_from_cf(cls, cf_dir):
+        k_folder = 'k=4' if 'k=4' in listdir(cf_dir) else 'k=3'
+        tuples = []
+
+        with open(cf_dir + '/' + k_folder + '/directed_communities') as f:
+            for line in f:
+                div = line.split(':')
+                group = div[0].strip()
+                if line.startswith('#') or group == '':
+                    continue
+                nodes = div[1].strip().split(' ')
+                for n in nodes:
+                    tuples.append((int(n), int(group)))
+        return tuples
+
+
+    @classmethod
+    def create_communities(cls, communities_list):
         """Creates a property map with communities of all nodes"""
-        communities = g.new_vertex_property('vector<int>')
-        g.vertex_properties['communities'] = communities
+        communities = defaultdict(list)
 
         for v_lab, comm in communities_list:
-            v = label2index[v_lab]
-            if not g.vertex_properties['communities'][v]:
-                g.vertex_properties['communities'][v] = [comm]
-            else:
-                g.vertex_properties['communities'][v].append(comm)
+            communities[v_lab].append(comm)
+
+        return communities
 
     def filter_community(self, community_label):
         """Filter out one community from the graph"""
         g = self.graph
+        l2i = self.label2index
+        comm =self.communities
 
-        for v in g.vertices():
-            if community_label in g.vp['communities'][v]:
+        for v_lab, v in l2i.items():
+            if community_label in comm[v_lab]:
                 g.vp['filter'][v] = True
             else:
                 g.vp['filter'][v] = False
@@ -86,3 +111,7 @@ class Network(object):
     def unfilter_graph(self):
         """Remove any filters from the graph"""
         self.graph.clear_filters()
+
+    def print_communities(self):
+        flatlist = [item for sublist in self.communities.values() for item in sublist]
+        print Counter(flatlist)
