@@ -5,13 +5,13 @@ import csv
 
 
 class Network(object):
-    def __init__(self, edges_file, communities_file=None):
+    def __init__(self, edges_file, communities_file=None, k=3):
         edges = self.read_file(edges_file)
         if communities_file is None:
             path = edges_file.split('/')
             path[-2] = 'communities'
             path[-1] = path[-1][:-6]  # cut off the '.edges' part
-            communities = self.get_communities_from_cf('/'.join(path))
+            communities = self.get_communities_from_cf('/'.join(path), k)
         else:
             communities = self.read_file(communities_file)
 
@@ -68,8 +68,9 @@ class Network(object):
             graph.vertex_properties["label"][v] = v_label
 
     @classmethod
-    def get_communities_from_cf(cls, cf_dir):
-        k_folder = 'k=4' if 'k=4' in listdir(cf_dir) else 'k=3'
+    def get_communities_from_cf(cls, cf_dir, k):
+        k_folder = "k={}".format(k)
+        # k_folder = 'k=4' if 'k=4' in listdir(cf_dir) else 'k=3'
         tuples = []
 
         with open(cf_dir + '/' + k_folder + '/directed_communities') as f:

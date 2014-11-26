@@ -27,7 +27,7 @@ def filtered(data, size):
     # return data
 
 
-def plot_centralities(network):
+def plot_centralities(network, title="Centrality measures"):
     g = network.graph
     comm_size = g.num_vertices()
 
@@ -41,7 +41,7 @@ def plot_centralities(network):
     betweenness = betw.get_array().tolist()
 
 
-    P.suptitle("Centrality measures")
+    P.suptitle(title)
     # P.figure()
 
 
