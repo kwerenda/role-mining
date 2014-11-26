@@ -1,0 +1,33 @@
+# The com. degree distr. of the directed  communities at k=4
+# from /Users/bogna/dev/role-mining/datasets/hepth/timeslots/cit-HepTh-2001.edges
+# at no lower link weight threshold,
+# and at no upper link weight threshold.
+# Links were treated as directed.
+# No time limit was set for the clique search.
+
+0 33
+1 31
+2 19
+3 19
+4 9
+5 3
+6 7
+7 1
+8 1
+9 8
+10 4
+11 2
+12 1
+13 3
+14 1
+15 1
+16 2
+17 8
+18 9
+19 3
+20 1
+23 1
+34 1
+57 1
+79 1
+

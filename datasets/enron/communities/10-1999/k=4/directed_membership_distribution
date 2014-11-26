@@ -1,0 +1,11 @@
+# The node membership distr. in the directed  communities at k=4
+# from /Users/bogna/dev/role-mining/datasets/enron/timeslots/10-1999.edges
+# at no lower link weight threshold,
+# and at no upper link weight threshold.
+# Links were treated as directed.
+# No time limit was set for the clique search.
+
+0 791
+1 64
+2 1
+

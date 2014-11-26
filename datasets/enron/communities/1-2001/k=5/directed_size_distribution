@@ -1,0 +1,20 @@
+# The size distr. of the directed  communities at k=5
+# from /Users/bogna/dev/role-mining/datasets/enron/timeslots/1-2001.edges
+# at no lower link weight threshold,
+# and at no upper link weight threshold.
+# Links were treated as directed.
+# No time limit was set for the clique search.
+
+5 14
+6 2
+7 2
+8 1
+10 1
+12 3
+14 1
+22 1
+26 1
+28 1
+90 1
+284 1
+

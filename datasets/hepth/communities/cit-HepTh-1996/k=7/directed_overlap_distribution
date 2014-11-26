@@ -1,0 +1,18 @@
+# The overlap size distr. of the directed  communities at k=7
+# from /Users/bogna/dev/role-mining/datasets/hepth/timeslots/cit-HepTh-1996.edges
+# at no lower link weight threshold,
+# and at no upper link weight threshold.
+# Links were treated as directed.
+# No time limit was set for the clique search.
+
+1 15
+2 26
+3 5
+4 1
+5 7
+6 5
+7 5
+9 1
+10 3
+11 1
+

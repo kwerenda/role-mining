@@ -1,0 +1,8 @@
+# The graph of directed at k=10
+# from /Users/bogna/dev/role-mining/datasets/enron/timeslots/8-2001.edges
+# at no lower link weight threshold,
+# and at no upper link weight threshold.
+# Links were treated as directed.
+# No time limit was set for the clique search.
+
+1 2 9

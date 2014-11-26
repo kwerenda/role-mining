@@ -1,0 +1,15 @@
+# The node membership distr. in the directed  communities at k=6
+# from /Users/bogna/dev/role-mining/datasets/hepth/timeslots/cit-HepTh-1996.edges
+# at no lower link weight threshold,
+# and at no upper link weight threshold.
+# Links were treated as directed.
+# No time limit was set for the clique search.
+
+0 5496
+1 531
+2 90
+3 23
+4 5
+7 2
+8 1
+

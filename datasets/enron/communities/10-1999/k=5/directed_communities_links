@@ -1,0 +1,44 @@
+# The links inside the directed communities at k=5
+# from /Users/bogna/dev/role-mining/datasets/enron/timeslots/10-1999.edges
+# at no lower link weight threshold,
+# and at no upper link weight threshold.
+# Links were treated as directed.
+# No time limit was set for the clique search.
+
+0:
+527 544
+527 1411
+527 550
+527 723
+544 1411
+544 550
+544 723
+1411 550
+1411 723
+723 550
+1:
+641 1066
+786 1066
+1541 1066
+519 1066
+17265 1066
+641 786
+641 1541
+641 519
+17265 641
+786 1541
+786 519
+786 17265
+1541 519
+17265 519
+2:
+558 1336
+558 825
+558 641
+558 786
+1336 825
+641 1336
+786 1336
+641 825
+786 825
+641 786
