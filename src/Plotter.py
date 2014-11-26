@@ -10,7 +10,7 @@ from src.RoleMining import RoleMining
 from collections import Counter
 from graph_tool import centrality, stats
 from math import isnan
-
+import matplotlib
 
 def plot_hist(data):
     # P.hist(data, bins=50, range=(0, 1))
@@ -100,6 +100,38 @@ def autolabel(rects):
         height = rect.get_height()
         P.text(rect.get_x()+rect.get_width()/2., 1.05*height, '%d' % int(height),
                ha='center', va='bottom')
+
+
+def plot_community_sizes(year):
+    colors = matplotlib.colors.cnames.keys()
+    prop = "directed_size_distribution"
+    # year = 1997
+    i = 0
+    for k in range(3, 13):
+        # if (i+1) % 4 == 0:
+        P.subplot(2, 2, (i+1) % 4)
+        plot_community_size_distribution_from_cfnider(year, k, "directed_size_distribution", colors[i])
+        i += 1
+        P.legend()
+        P.xlim([0, 100])
+        P.xticks(range(0, 100, 5))
+        P.suptitle("Community size distribution by size of k-clique" + " year: " + str(year))
+
+
+
+def plot_community_size_distribution_from_cfnider(year, k, prop, color):
+    filename = "datasets/enron/communities/8-{0}/k={1}/{2}".format(year, k, prop)
+    # filename = "datasets/hepth/communities/cit-HepTh-{0}/k={1}/{2}".format(year, k, prop)
+    lines = HepReader.read_lines(filename)
+    sizes = {int(size): int(count) for size, count in [line.split() for line in lines if len(line) != 0]}
+    x = sizes.keys()
+    y = sizes.values()
+
+    P.bar(x, y, label="year:{}, k={}, max={}".format(year, k, max(x)), align='center', alpha=0.7, color=color)
+
+    # P.xlabel("Size of community [members]")
+    # P.ylabel("Number of communities")
+
 
 
 def plot_community_size_distribution():
