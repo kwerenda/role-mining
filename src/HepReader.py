@@ -26,6 +26,11 @@ class HepReader(object):
 
     DATE_FORMAT = '%Y-%m-%d'
 
+    @staticmethod
+    def read_lines(filename):
+        with open(filename) as f:
+            return [line.strip() for line in f.readlines() if not line.startswith('#') and not len(line) == 0]
+
     def get_edges(self):
         return self.edges
 

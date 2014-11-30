@@ -1,0 +1,12 @@
+# The directed cliques from /Users/bogna/dev/role-mining/datasets/enron/timeslots/1-1999.edges
+# at no lower link weight threshold,
+# and at no upper link weight threshold.
+# Links were treated as directed.
+# No time limit was set for the clique search.
+
+0: 786 777 1545 
+1: 786 777 498 
+2: 786 777 519 
+3: 786 777 714 
+4: 786 777 927 
+5: 1550 786 777 

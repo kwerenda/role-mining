@@ -1,0 +1,8 @@
+# The contained directed cliques in the directed communities at k=11
+# from /Users/bogna/dev/role-mining/datasets/enron/timeslots/1-2001.edges
+# at no lower link weight threshold,
+# and at no upper link weight threshold.
+# Links were treated as directed.
+# No time limit was set for the clique search.
+
+0: 3522 3523 3524 3525 3527 3529 3530 3534 3694 3695 3799 3528 3696 3701 3621 3699 3700 3803 3622 3703 3532 3810 3811 3535 3789 3781 3780 3788 3808 3702 3809 3697 3688 3698 3800 3801 3820 3687 3686 3728 3815 3541 3584 3540 3543 3542 3804 3583 3531 

@@ -1,0 +1,76 @@
+# The graph of directed at k=7
+# from /Users/bogna/dev/role-mining/datasets/hepth/timeslots/cit-HepTh-1996.edges
+# at no lower link weight threshold,
+# and at no upper link weight threshold.
+# Links were treated as directed.
+# No time limit was set for the clique search.
+
+0 6 6
+0 11 10
+0 12 2
+0 13 1
+0 14 5
+0 17 2
+0 18 2
+0 20 2
+0 23 1
+0 24 5
+0 26 1
+0 27 2
+2 11 2
+2 16 2
+2 19 11
+2 22 10
+2 25 2
+4 7 5
+6 8 6
+6 9 3
+6 11 7
+6 12 10
+6 13 5
+6 14 1
+6 17 2
+6 18 6
+6 20 5
+6 23 3
+6 24 2
+6 25 1
+6 26 7
+6 27 7
+8 9 3
+11 12 2
+11 14 1
+11 16 1
+11 17 6
+11 18 2
+11 19 2
+11 20 2
+11 21 7
+11 22 1
+11 23 1
+11 24 2
+11 25 9
+11 26 7
+11 27 3
+12 18 2
+12 20 2
+12 23 5
+12 24 1
+12 26 2
+12 27 2
+14 24 3
+16 19 2
+16 22 2
+16 25 1
+18 20 2
+18 24 1
+18 26 2
+18 27 2
+19 22 6
+19 25 2
+20 24 1
+20 26 2
+20 27 5
+22 25 1
+24 27 1
+26 27 4

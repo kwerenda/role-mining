@@ -1,0 +1,21 @@
+# The size distr. of the directed  communities at k=8
+# from /Users/bogna/dev/role-mining/datasets/hepth/timeslots/cit-HepTh-1997.edges
+# at no lower link weight threshold,
+# and at no upper link weight threshold.
+# Links were treated as directed.
+# No time limit was set for the clique search.
+
+8 2
+9 4
+10 1
+11 2
+12 1
+13 1
+14 1
+17 1
+18 1
+32 1
+38 1
+88 1
+89 1
+

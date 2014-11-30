@@ -1,0 +1,8 @@
+# The directed communities at k=6
+# from /Users/bogna/dev/role-mining/datasets/hepth/timeslots/cit-HepTh-1994.edges
+# at no lower link weight threshold,
+# and at no upper link weight threshold.
+# Links were treated as directed.
+# No time limit was set for the clique search.
+
+0: 9402031 9303016 9310112 9310202 9311081 9311093 9403041 9312182 9403191 9404063 9404114 9404132 9406067 9406136 9407005 9407099 
