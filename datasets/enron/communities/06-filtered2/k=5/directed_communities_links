@@ -1,0 +1,26 @@
+# The links inside the directed communities at k=5
+# from /Users/bogna/dev/role-mining/datasets/enron/timeslots/06-filtered2.edges
+# at no lower link weight threshold,
+# and at no upper link weight threshold.
+# Links were treated as directed.
+# No time limit was set for the clique search.
+
+0:
+00009 00013
+00009 00048
+00009 00050
+00009 00057
+00009 00067
+00147 00009
+00013 00048
+00013 00050
+00013 00057
+00013 00067
+00147 00013
+00048 00050
+00048 00067
+00050 00057
+00050 00067
+00050 00147
+00057 00067
+00147 00067

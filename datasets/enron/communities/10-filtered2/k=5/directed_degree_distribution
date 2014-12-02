@@ -1,0 +1,12 @@
+# The com. degree distr. of the directed  communities at k=5
+# from /Users/bogna/dev/role-mining/datasets/enron/timeslots/10-filtered2.edges
+# at no lower link weight threshold,
+# and at no upper link weight threshold.
+# Links were treated as directed.
+# No time limit was set for the clique search.
+
+1 4
+2 1
+3 2
+4 1
+

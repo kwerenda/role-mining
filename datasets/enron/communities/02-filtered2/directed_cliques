@@ -1,0 +1,25 @@
+# The directed cliques from /Users/bogna/dev/role-mining/datasets/enron/timeslots/02-filtered2.edges
+# at no lower link weight threshold,
+# and at no upper link weight threshold.
+# Links were treated as directed.
+# No time limit was set for the clique search.
+
+0: 00017 00026 00061 
+1: 00048 00027 00052 
+2: 00032 00068 00137 
+3: 00049 00137 00070 
+4: 00057 00076 00142 
+5: 00049 00100 00145 
+6: 00011 00038 00075 
+7: 00069 00073 00139 
+8: 00009 00048 00067 00147 
+9: 00009 00048 00057 00067 
+10: 00048 00147 00027 
+11: 00011 00075 00137 
+12: 00049 00032 00137 
+13: 00032 00069 00137 
+14: 00069 00137 00073 
+15: 00044 00100 00102 
+16: 00049 00100 00102 
+17: 00017 00049 00061 
+18: 00049 00137 00073 

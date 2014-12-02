@@ -2,9 +2,16 @@
 
 
 from datetime import date, datetime
-from collections import defaultdict
 from itertools import chain
+from collections import defaultdict
 
+def read_lines(filename):
+        with open(filename) as f:
+            return [line.strip() for line in f.readlines() if not line.startswith('#') and not len(line) == 0]
+
+
+def read_int_lines(filename):
+    return [[int(e) for e in x.split()] for x in read_lines(filename)]
 
 class Node(object):
     def __init__(self, nid, ndate, communities):
@@ -12,6 +19,42 @@ class Node(object):
         self.communities = communities
         self.ndate = ndate
         self.roles = dict()
+
+
+class EnronReader(object):
+
+    def __init__(self, filename, with_days=True):
+        self.edges_with_days = read_int_lines(filename)
+        self.daysets = defaultdict(set)
+        for sender, receiver, day in self.edges_with_days:
+            self.daysets[sender].add(day)
+        self.edges = [[s, r] for s, r, d in self.edges_with_days]
+        self.filename = filename
+
+
+    def filter(self, min_days):
+        """leave only edges including nodes who sent mails at least min_days different days in given month"""
+        active = lambda x: len(self.daysets[x]) >= min_days
+        self.edges = [[s, r] for s, r, d in self.edges_with_days if active(s) and active(r)]
+        self.min_days = min_days
+        return self.edges
+
+    def write_filtered(self):
+        with open(self.filename.replace(".edges", "-filtered{}.edges".format(self.min_days)), 'w') as fout:
+            for sender, receiver in self.edges:
+                fout.write("{:05d}\t{:05d}\n".format(sender, receiver))
+
+        # if write_to_file:
+        #     for year in slots:
+        #         with open(base_filename.replace('.txt', '-{}.edges'.format(year.year)), 'w') as fout:
+        #             for edge in slots[year]:
+        #                 fout.write("{:07d}\t{:07d}\n".format(edge[0], edge[1]))
+        #                 lines += 1
+        #     print "Lines written", lines
+        # return slots
+
+
+
 
 
 class HepReader(object):
@@ -26,10 +69,6 @@ class HepReader(object):
 
     DATE_FORMAT = '%Y-%m-%d'
 
-    @staticmethod
-    def read_lines(filename):
-        with open(filename) as f:
-            return [line.strip() for line in f.readlines() if not line.startswith('#') and not len(line) == 0]
 
     def get_edges(self):
         return self.edges

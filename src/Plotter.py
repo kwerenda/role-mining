@@ -5,7 +5,7 @@
 from datetime import datetime
 
 import pylab as P
-from src.HepReader import HepReader
+from src.Reader import HepReader
 from src.RoleMining import RoleMining
 from collections import Counter
 from graph_tool import centrality, stats
