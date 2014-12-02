@@ -53,10 +53,10 @@ class RoleMining(object):
         g = self.network.graph
         outsiders = self.find_outsiders()
         closeness_pm = centrality.closeness(g)
-        closeness = [1 if isnan(x) else x for x in closeness_pm.get_array().tolist()]
+        closeness = [closeness_pm[v] for v in g.vertices()]
         m, sd = mean(closeness), std(closeness)
-        leaders = self.find_leaders(closeness_pm, m + 2 * sd)
-        outermosts = self.find_outermosts(closeness_pm, m - 2 * sd)
+        leaders = self.find_leaders(closeness_pm, m + 1 * sd)
+        outermosts = self.find_outermosts(closeness_pm, m - 1 * sd)
         return outsiders, leaders, outermosts
 
 
