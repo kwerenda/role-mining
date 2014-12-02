@@ -1,3 +1,6 @@
+from graph_tool import centrality
+from math import isnan
+from numpy import mean, std
 
 def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)
@@ -12,12 +15,48 @@ class RoleMining(object):
         self.network = network
 
     def find_outsiders(self):
-        # depends on the grouping, probably the ones without
-        pass
-        # for comm in sorted(self.communities.values(), key=len):
-        #     print len(comm)
-        #     if len(comm) == 1:
-        #         print "outsider: ", comm[0]
+        outsiders = []
+        g = self.network.graph
+        communities = self.network.communities
 
+        for v in g.vertices():
+            label = g.vp['label'][v]
+            if communities[label] == []:
+                outsiders.append(label)
+
+        return outsiders
+
+
+    def find_leaders(self, closeness, threshold):
+        leaders = []
+        g = self.network.graph
+
+        for v in g.vertices():
+            if isnan(closeness[v]) or closeness[v] >= threshold:
+                leaders.append(g.vp['label'][v])
+
+        return leaders
+
+
+    def find_outermosts(self, closeness, threshold):
+        outermosts = []
+        g = self.network.graph
+
+        for v in g.vertices():
+            if not isnan(closeness[v]) and closeness[v] <= threshold:
+                outermosts.append(g.vp['label'][v])
+
+        return outermosts
+
+
+    def find_roles(self):
+        g = self.network.graph
+        outsiders = self.find_outsiders()
+        closeness_pm = centrality.closeness(g)
+        closeness = [1 if isnan(x) else x for x in closeness_pm.get_array().tolist()]
+        m, sd = mean(closeness), std(closeness)
+        leaders = self.find_leaders(closeness_pm, m + 2 * sd)
+        outermosts = self.find_outermosts(closeness_pm, m - 2 * sd)
+        return outsiders, leaders, outermosts
 
 
