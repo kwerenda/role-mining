@@ -13,6 +13,7 @@ class RoleMining(object):
 
     def __init__(self, network):
         self.network = network
+        self.closeness = []
 
     def find_outsiders(self):
         outsiders = []
@@ -57,6 +58,7 @@ class RoleMining(object):
         m, sd = mean(closeness), std(closeness)
         leaders = self.find_leaders(closeness_pm, m + 1 * sd)
         outermosts = self.find_outermosts(closeness_pm, m - 1 * sd)
+        self.closeness = closeness
         return outsiders, leaders, outermosts
 
 

@@ -11,6 +11,8 @@ from collections import Counter
 from graph_tool import centrality, stats
 from math import isnan
 import matplotlib
+import numpy as np
+import matplotlib.mlab as mlab
 
 def plot_hist(data):
     # P.hist(data, bins=50, range=(0, 1))
@@ -25,6 +27,25 @@ def filtered(data, size):
     #     data = data[:size]
     return sorted(data, reverse=True)[:size]
     # return data
+
+def plot_fit_and_tails(closeness, title):
+    P.suptitle(title)
+    m, sd = np.mean(closeness), np.std(closeness)
+    outer = m - sd
+    if outer > 0:
+        P.axvspan(0, outer, alpha=0.2, color='c', label="Outermosts")
+    leaders = m + sd
+    if leaders < 1:
+        P.axvspan(leaders, 1, alpha=0.2, color='y', label="Leaders")
+    P.hist(closeness, bins=len(closeness), color='#AB717A')
+    x = np.linspace(0, 1, 100)
+    P.plot(x, mlab.normpdf(x, m, sd), '--', color='k')
+    P.xticks(np.arange(0, 1, 0.1))
+    P.legend()
+    P.xlim([0, 1])
+
+
+
 
 
 def plot_centralities(network, title="Centrality measures"):
