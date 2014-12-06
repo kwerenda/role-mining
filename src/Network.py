@@ -6,15 +6,17 @@ import graph_tool.topology as gt
 
 
 class Network(object):
-    def __init__(self, edges_file, communities_file=None, k=3, is_directed=True):
+    def __init__(self, edges_file, communities_file=None, k=3, is_directed=True, use_communities=False):
         edges = self.read_file(edges_file)
-        if communities_file is None:
-            path = edges_file.split('/')
-            path[-2] = 'communities'
-            path[-1] = path[-1][:-6]  # cut off the '.edges' part
-            communities = self.get_communities_from_cf('/'.join(path), k)
-        else:
-            communities = self.read_file(communities_file)
+        if use_communities:
+            if communities_file is None:
+                path = edges_file.split('/')
+                path[-2] = 'communities'
+                path[-1] = path[-1][:-6]  # cut off the '.edges' part
+                communities = self.get_communities_from_cf('/'.join(path), k)
+            else:
+                communities = self.read_file(communities_file)
+            self.communities = self.create_communities(communities)
 
         g, label2index = self.create_graph(edges, is_directed)
 
@@ -25,7 +27,7 @@ class Network(object):
 
         self.graph = g
         self.label2index = label2index
-        self.communities = self.create_communities(communities)
+
 
     @classmethod
     def read_file(cls, filename):
