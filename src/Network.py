@@ -2,10 +2,12 @@ from collections import defaultdict, Counter
 from os import listdir
 from graph_tool import Graph
 import csv
+from itertools import product
+import graph_tool.topology as gt
 
 
 class Network(object):
-    def __init__(self, edges_file, communities_file=None, k=3):
+    def __init__(self, edges_file, communities_file=None, k=3, is_directed=True):
         edges = self.read_file(edges_file)
         if communities_file is None:
             path = edges_file.split('/')
@@ -15,7 +17,7 @@ class Network(object):
         else:
             communities = self.read_file(communities_file)
 
-        g, label2index = self.create_graph(edges)
+        g, label2index = self.create_graph(edges, is_directed)
 
         filter_prop = g.new_vertex_property('bool')
         g.vertex_properties['filter'] = filter_prop
@@ -42,10 +44,11 @@ class Network(object):
         return pairs
 
     @classmethod
-    def create_graph(cls, edges):
+    def create_graph(cls, edges, is_directed=True):
         """Create a graph-tool type graph from a list of edges"""
 
         g = Graph()
+        g.set_directed(is_directed)
         label2index = dict()
         label = g.new_vertex_property('int32_t')
         g.vertex_properties['label'] = label
@@ -116,3 +119,34 @@ class Network(object):
     def print_communities(self):
         flatlist = [item for sublist in self.communities.values() for item in sublist]
         print Counter(flatlist)
+
+    def shortest_paths(self, v1, v2):
+        """Return ALL shortest paths between v1 and v2"""
+        #TODO: !
+        vertices, edges = gt.shortest_path(self.graph, v1, v2)
+        return [vertices]
+
+
+    def calculate_CBC(self, is_directed=True):
+        """Calculate CBC for all nodes in network"""
+
+        cdc = self.graph.new_vertex_property('int32_t')
+        self.graph.vertex_properties['CDC'] = cdc
+        #set all to 0
+        for v in self.graph.vertices():
+                self.graph.vp['CDC'][v] = 0
+
+        # dla kazdej pary wezlow w grafie - kolejnosc ma znaczenie
+        for v1, v2 in product(self.graph.vertices(), self.graph.vertices()):
+            # jezeli community (c1) != commmunity (C2)
+            if set(self.communities[v1]).isdisjoint(set(self.communities[v2])):
+                #   dla kazdej najkrotszej sciezki p od c1 do c2
+                for path in self.shortest_paths(v1, v2):
+                    for v in path:
+                        self.graph.vp['CDC'][v] += 1
+
+        if not is_directed:
+            for v in self.graph.vertices():
+                self.graph.vp['CDC'][v] /= 2
+
+

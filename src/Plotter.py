@@ -22,10 +22,11 @@ def plot_hist(data):
 
 
 def filtered(data, size):
+    return sorted(data, reverse=True)[:size]
     # data = [x for x in data if x != 0]
     # if len(data) > size:
     #     data = data[:size]
-    return sorted(data, reverse=True)[:size]
+
     # return data
 
 def plot_fit_and_tails(closeness, title):

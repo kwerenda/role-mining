@@ -16,9 +16,22 @@ def mine(month, com):
     P.savefig("/Users/bogna/Documents/ED/projekt/04/enron{}_{}.png".format(month, com))
     return R
 
-
 if __name__ == '__main__':
-    mine(12, 3)
+    # mine(12, 3)
+    n = Network("datasets/enron/timeslots/06-filtered2.edges", k=3, is_directed=False)
+    n.calculate_CBC()
+    print "CDC"
+    for v in n.graph.vertices():
+        print "CDC({}) = {}".format(n.graph.vp['label'][v], n.graph.vp['CDC'][v])
+    # n.filter_community(1)
+    # Plotter.plot_centralities(n)
+
+
+    # min_days = 3
+    # for month in range(1, 13):
+    #     e = EnronReader("datasets/enron/timeslots/{:02d}.edges".format(month))
+    #     e.filter(min_days)
+    #     e.write_filtered()
 
 
     # N1 = Network('datasets/enron/timeslots/03-filtered2.edges')
