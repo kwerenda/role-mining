@@ -1,5 +1,4 @@
-from collections import defaultdict, Counter
-from os import listdir
+from collections import defaultdict, Counter, deque
 from graph_tool import Graph
 import csv
 from itertools import product
@@ -122,9 +121,28 @@ class Network(object):
 
     def shortest_paths(self, v1, v2):
         """Return ALL shortest paths between v1 and v2"""
-        #TODO: !
-        vertices, edges = gt.shortest_path(self.graph, v1, v2)
-        return [vertices]
+        g = self.graph
+        visited = set()
+        paths = []
+
+        # BFS
+        queue = deque([(v1, [])])
+        while queue:
+            curr_v, curr_path = queue.popleft()
+
+            # add no matter if it was previously visited
+            visited.add(curr_v)
+            if len(paths) == 0 or len(paths[0]) >= len(curr_path) + 1:
+
+                if curr_v == v2:
+                    paths.append(curr_path + [v2])
+                else:
+                    # add all neighbours to the queue
+                    new_path = curr_path + [curr_v]
+                    queue.extend([(v, new_path) for v in curr_v.out_neighbours() if v not in visited])
+
+        # vertices, edges = gt.shortest_path(self.graph, v1, v2)
+        return paths
 
 
     def calculate_CBC(self, is_directed=True):
