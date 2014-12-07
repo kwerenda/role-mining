@@ -1,7 +1,8 @@
+from __future__ import division
 from collections import defaultdict, Counter, deque
 from graph_tool import Graph
 import csv
-from itertools import product
+from itertools import product, combinations
 import graph_tool.topology as gt
 
 
@@ -19,7 +20,6 @@ class Network(object):
             self.communities = self.create_communities(communities)
 
         g, label2index = self.create_graph(edges, is_directed)
-
         filter_prop = g.new_vertex_property('bool')
         g.vertex_properties['filter'] = filter_prop
 
@@ -118,12 +118,16 @@ class Network(object):
         self.graph.clear_filters()
 
     def print_communities(self):
-        flatlist = [item for sublist in self.communities.values() for item in sublist]
+        flatlist = flatten_list(self.communities.values())
         print Counter(flatlist)
 
-    def shortest_paths(self, v1, v2):
+    def get_vertices_from_community(self, comm_nr):
+        g, communities = self.graph, self.communities
+        return [v for v in g.vertices() if comm_nr in communities[g.vp['label'][v]]]
+
+    @staticmethod
+    def shortest_paths(v1, v2):
         """Return ALL shortest paths between v1 and v2"""
-        g = self.graph
         visited = set()
         paths = []
 
@@ -137,14 +141,44 @@ class Network(object):
             if len(paths) == 0 or len(paths[0]) >= len(curr_path) + 1:
 
                 if curr_v == v2:
-                    paths.append(curr_path + [v2])
+                    # condition for v1 == v2
+                    paths.append(curr_path + [v2]) if curr_path != [] else paths.append([])
                 else:
                     # add all neighbours to the queue
                     new_path = curr_path + [curr_v]
                     queue.extend([(v, new_path) for v in curr_v.out_neighbours() if v not in visited])
 
-        # vertices, edges = gt.shortest_path(self.graph, v1, v2)
         return paths
+
+    def get_mediators(self):
+        """Calculates and prints out (for now) NBC of the best nodes
+        in all community combinations"""
+        communities = set(flatten_list(self.communities.values()))
+        done = dict()
+        for c1, c2 in combinations(communities, 2):
+            cpaths = []
+            vgroup_1 = self.get_vertices_from_community(c1)
+            vgroup_2 = self.get_vertices_from_community(c2)
+            div = min(len(vgroup_1), len(vgroup_2))
+
+            for v1, v2 in product(vgroup_1, vgroup_2):
+                if (v2, v1) not in done and (v1, v2) not in done:
+                    shortest = self.shortest_paths(v1, v2)
+                    cpaths.extend(shortest)
+                    done[(v1, v2)] = shortest
+                else:
+                    shortest = done[(v1, v2)] if (v1, v2) in done else done[(v2, v1)]
+                    cpaths.extend(shortest)
+
+            flatlist = []
+            for l in cpaths:
+                flatlist.extend(l[1:-1])
+            cnt = Counter(flatlist)
+
+            print "Groups: ", c1, c2  # to be replaced if this function has some future
+            for node, cbc in cnt.most_common():
+                print node, cbc / div
+
 
 
     def calculate_CBC(self, is_directed=True):
@@ -158,8 +192,10 @@ class Network(object):
 
         # dla kazdej pary wezlow w grafie - kolejnosc ma znaczenie
         for v1, v2 in product(self.graph.vertices(), self.graph.vertices()):
+            v1_lab, v2_lab = self.label2index[v1], self.label2index[v2]
+
             # jezeli community (c1) != commmunity (C2)
-            if set(self.communities[v1]).isdisjoint(set(self.communities[v2])):
+            if set(self.communities[v1_lab]).isdisjoint(set(self.communities[v2_lab])):
                 #   dla kazdej najkrotszej sciezki p od c1 do c2
                 for path in self.shortest_paths(v1, v2):
                     for v in path:
@@ -170,3 +206,6 @@ class Network(object):
                 self.graph.vp['CDC'][v] /= 2
 
 
+
+def flatten_list(l):
+    return [item for sublist in l for item in sublist]
