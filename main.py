@@ -19,8 +19,9 @@ def mine(month, com):
 
 if __name__ == '__main__':
     # mine(12, 3)
-    n = Network("datasets/enron/timeslots/08-filtered3.edges", is_directed=False, use_communities=True)
-
-    n.print_communities()
-    print "Whole network: ", n.graph.num_vertices()
-    n.get_mediators()
+    for month in range(1,13):
+        n = Network("datasets/enron/timeslots/{:02d}-filtered3.edges".format(month), is_directed=False, use_communities=True)
+        print
+        print "Month: ", month
+        n.print_communities()
+        n.get_wannabe_mediators()

@@ -99,17 +99,17 @@ class Network(object):
 
         return communities
 
-    def filter_community(self, community_label):
+    def filter_community(self, community_labels):
         """Filter out one community from the graph"""
         g = self.graph
-        l2i = self.label2index
         comm =self.communities
 
-        for v_lab, v in l2i.items():
-            if community_label in comm[v_lab]:
-                g.vp['filter'][v] = True
-            else:
+        for v in g.vertices():
+            v_lab = g.vp['label'][v]
+            if set(comm[v_lab]).isdisjoint(set(community_labels)):
                 g.vp['filter'][v] = False
+            else:
+                g.vp['filter'][v] = True
 
         g.set_vertex_filter(g.vp['filter'])
 
@@ -180,7 +180,6 @@ class Network(object):
                 print node, cbc / div
 
 
-
     def calculate_CBC(self, is_directed=True):
         """Calculate CBC for all nodes in network"""
 
@@ -204,6 +203,23 @@ class Network(object):
         if not is_directed:
             for v in self.graph.vertices():
                 self.graph.vp['CDC'][v] /= 2
+
+    def get_wannabe_mediators(self):
+        g, communities = self.graph, self.communities
+        bigrouped = [v for v in g.vertices() if len(communities[g.vp['label'][v]]) > 1]
+
+        for v in bigrouped:
+            v_lab = g.vp['label'][v]
+
+            self.filter_community(communities[v_lab])
+            v_degree =  v.out_degree()
+            degrees = [i.out_degree() for i in g.vertices()]
+            avg_degree = sum(degrees) / len(degrees)
+            self.unfilter_graph()
+
+            ratio = v_degree / avg_degree
+            if ratio > 1:
+                print "Bloke: ", v_lab, ratio
 
 
 
