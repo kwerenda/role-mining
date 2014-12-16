@@ -7,7 +7,7 @@ from collections import defaultdict
 
 def read_lines(filename):
         with open(filename) as f:
-            return [line.strip() for line in f.readlines() if not line.startswith('#') and not len(line) == 0]
+            return [line.strip().split() for line in f.readlines() if not line.startswith('#') and not len(line) == 0]
 
 
 def read_int_lines(filename):

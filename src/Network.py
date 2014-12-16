@@ -7,18 +7,26 @@ import graph_tool.topology as gt
 
 
 class Network(object):
-    def __init__(self, edges_file, communities_file=None, k=3, is_directed=True, use_communities=False):
+    def __init__(self, edges_file, communities_file=None, k=3, is_directed=True, use_communities=False, cfinder=True):
         edges = self.read_file(edges_file)
-        if use_communities:
-            if communities_file is None:
-                path = edges_file.split('/')
-                path[-2] = 'communities'
-                path[-1] = path[-1][:-6]  # cut off the '.edges' part
-                communities = self.get_communities_from_cf('/'.join(path), k)
+
+
+
+        if use_communities and communities_file is None:
+            path = edges_file.split('/')
+            path[-2] = 'communities'
+            path[-1] = path[-1][:-6]  # cut off the '.edges' part
+            k_folder = "k={}".format(k)
+            cf_dir = '/'.join(path)
+            communities = self.get_communities_from_cf(cf_dir + '/' + k_folder + '/directed_communities')
+            # self.communities = self.get_communities_from_cf('/'.join(path), k)
+            self.communities = self.create_communities(communities)
+        elif communities_file is not None:
+            if cfinder:
+                communities = self.get_communities_from_cf(communities_file)
             else:
                 communities = self.read_file(communities_file)
             self.communities = self.create_communities(communities)
-
         g, label2index = self.create_graph(edges, is_directed)
         filter_prop = g.new_vertex_property('bool')
         g.vertex_properties['filter'] = filter_prop
@@ -72,12 +80,13 @@ class Network(object):
             graph.vertex_properties["label"][v] = v_label
 
     @classmethod
-    def get_communities_from_cf(cls, cf_dir, k):
-        k_folder = "k={}".format(k)
+    def get_communities_from_cf(cls, filename):
+        # k_folder = "k={}".format(k)
         # k_folder = 'k=4' if 'k=4' in listdir(cf_dir) else 'k=3'
         tuples = []
 
-        with open(cf_dir + '/' + k_folder + '/directed_communities') as f:
+        # with open(cf_dir + '/' + k_folder + '/directed_communities') as f:
+        with open(filename) as f:
             for line in f:
                 div = line.split(':')
                 group = div[0].strip()
@@ -119,7 +128,7 @@ class Network(object):
 
     def print_communities(self):
         flatlist = flatten_list(self.communities.values())
-        print Counter(flatlist)
+        print "communities", Counter(flatlist)
 
     def get_vertices_from_community(self, comm_nr):
         g, communities = self.graph, self.communities
@@ -161,8 +170,11 @@ class Network(object):
             vgroup_2 = self.get_vertices_from_community(c2)
             div = min(len(vgroup_1), len(vgroup_2))
 
+            print "Calculating for communities: ", c1, c2
             for v1, v2 in product(vgroup_1, vgroup_2):
+                print "Calc for nodes ", v1, v2
                 if (v2, v1) not in done and (v1, v2) not in done:
+                    print "====searching for shortest paths==="
                     shortest = self.shortest_paths(v1, v2)
                     cpaths.extend(shortest)
                     done[(v1, v2)] = shortest
@@ -171,39 +183,16 @@ class Network(object):
                     cpaths.extend(shortest)
 
             flatlist = []
+            print "now let's count it"
             for l in cpaths:
                 flatlist.extend(l[1:-1])
             cnt = Counter(flatlist)
 
             print "Groups: ", c1, c2  # to be replaced if this function has some future
+            print "id score"
             for node, cbc in cnt.most_common():
-                print node, cbc / div
+                print node, cbc/div
 
-
-
-    def calculate_CBC(self, is_directed=True):
-        """Calculate CBC for all nodes in network"""
-
-        cdc = self.graph.new_vertex_property('int32_t')
-        self.graph.vertex_properties['CDC'] = cdc
-        #set all to 0
-        for v in self.graph.vertices():
-                self.graph.vp['CDC'][v] = 0
-
-        # dla kazdej pary wezlow w grafie - kolejnosc ma znaczenie
-        for v1, v2 in product(self.graph.vertices(), self.graph.vertices()):
-            v1_lab, v2_lab = self.label2index[v1], self.label2index[v2]
-
-            # jezeli community (c1) != commmunity (C2)
-            if set(self.communities[v1_lab]).isdisjoint(set(self.communities[v2_lab])):
-                #   dla kazdej najkrotszej sciezki p od c1 do c2
-                for path in self.shortest_paths(v1, v2):
-                    for v in path:
-                        self.graph.vp['CDC'][v] += 1
-
-        if not is_directed:
-            for v in self.graph.vertices():
-                self.graph.vp['CDC'][v] /= 2
 
 
 
