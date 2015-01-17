@@ -15,19 +15,11 @@ import numpy as np
 import matplotlib.mlab as mlab
 
 def plot_hist(data):
-    # P.hist(data, bins=50, range=(0, 1))
     P.hist(data, bins=50)
-    # P.xscale('log')
-    # P.yscale('log', nonposy='clip')
 
 
 def filtered(data, size):
     return sorted(data, reverse=True)[:size]
-    # data = [x for x in data if x != 0]
-    # if len(data) > size:
-    #     data = data[:size]
-
-    # return data
 
 def plot_fit_and_tails(closeness, title):
     P.suptitle(title)
@@ -37,16 +29,43 @@ def plot_fit_and_tails(closeness, title):
         P.axvspan(0, outer, alpha=0.2, color='c', label="Outermosts")
     leaders = m + sd
     if leaders < 1:
-        P.axvspan(leaders, 1, alpha=0.2, color='y', label="Leaders")
-    P.hist(closeness, bins=len(closeness), color='#AB717A')
-    x = np.linspace(0, 1, 100)
+        P.axvspan(leaders, 0.2, alpha=0.2, color='y', label="Leaders")
+    P.hist(closeness, color='#AB717A')
+    x = np.linspace(0, 0.2)
     P.plot(x, mlab.normpdf(x, m, sd), '--', color='k')
-    P.xticks(np.arange(0, 1, 0.1))
+    # P.xticks(np.arange(0, 0.2, 0.01))
     P.legend()
-    P.xlim([0, 1])
+    # P.xlim([0, 1])
 
 
+def plot_directed_centralities(pr, auth, ev, katz, comm_size, comm_nr):
+    P.suptitle("Centralities for community nr: " + str(comm_nr))
 
+    pagerank = filtered(pr.values(), comm_size)
+    P.subplot(2, 2, 1)
+    plot_hist(pagerank)
+    P.xlabel("Pagerank centrality")
+    P.ylabel("Number of nodes (total={})".format(len(pagerank)))
+
+    authority = filtered(auth.values(), comm_size)
+    P.subplot(2, 2, 2)
+    plot_hist(authority)
+    P.xlabel("Authority centrality")
+    P.ylabel("Number of nodes (total={})".format(len(authority)))
+
+    kz= filtered(katz.values(), comm_size)
+    P.subplot(2, 2, 3)
+    plot_hist(kz)
+    P.xlabel("Katz centrality")
+    P.ylabel("Number of nodes (total={})".format(len(kz)))
+
+    eigenvector = filtered(ev.values(), comm_size)
+    P.subplot(2, 2, 4)
+    plot_hist(eigenvector)
+    P.xlabel("Eigenvector centrality")
+    P.ylabel("Number of nodes (total={})".format(len(eigenvector)))
+
+    P.show()
 
 
 def plot_centralities(network, title="Centrality measures"):
@@ -151,8 +170,8 @@ def plot_community_size_distribution_from_cfnider(year, k, prop, color):
 
     P.bar(x, y, label="year:{}, k={}, max={}".format(year, k, max(x)), align='center', alpha=0.7, color=color)
 
-    # P.xlabel("Size of community [members]")
-    # P.ylabel("Number of communities")
+    P.xlabel("Size of community [members]")
+    P.ylabel("Number of communities")
 
 
 
@@ -161,8 +180,6 @@ def plot_community_size_distribution():
     sizes = Counter()
     all_sizes = []
     for year in range(1992, 2004):
-    # for year in range(1992, 2004):
-    #     P.figure()
 
         hp = HepReader.get_for_year(year)
         rm = RoleMining(hp.get_nodes(), hp.get_edges())
@@ -171,14 +188,9 @@ def plot_community_size_distribution():
         counted = Counter(sizes_of_communities)
         sizes += counted
 
-    # years = 2004 - 1992
-    # x = sorted(sizes.keys())
     min_size = 10
     max_size = max(all_sizes)
-    # x = x[min_size:]
-    # y = [sizes[v] for v in x]
-    # stds = [sizes[i]/years for i in x]
-    #
+
     year = "overall"
 
 
@@ -186,12 +198,6 @@ def plot_community_size_distribution():
     P.ylabel("Number of communities")
     P.suptitle("Year {}, communities bigger than 10 members\nNon-overlapping community size distribution".format(year))
         # P.yscale('log',  nonposy='clip')
-
-
-
-
-    # bars = P.bar(x, y, align='center', color="m", yerr=stds, alpha=0.8)
-
 
     n, bins, patches = P.hist(filter(lambda x: x > min_size, all_sizes))
     autolabel(patches)
@@ -218,9 +224,7 @@ def plot_citat_age():
     P.show()
 
 
-def plot_smth():
-    # P.style.xkcd()
-    # slots = get_edges_per_slot()
+def plot_data_distribution():
     minyear = 1992
     maxyear = 2003
     x = [datetime(year, 01, 01) for year in range(minyear, maxyear + 1)]
@@ -231,74 +235,34 @@ def plot_smth():
 
 
     x = sorted(x)
-    dates = HepReader.read_dates("/Users/bogna/dev/role-mining/datasets/hepth/cit-HepTh-dates-cleaned-dupl.txt")
-    edges = HepReader.read_edges("/Users/bogna/dev/role-mining/datasets/hepth/cit-HepTh.txt")
+    dates = HepReader.read_dates("/home/stpk/dev/role-mining/datasets/hepth/cit-HepTh-dates-cleaned.txt")
+    edges = HepReader.read_edges("/home/stpk/dev/role-mining/datasets/hepth/cit-HepTh.txt")
     slots = HepReader.split_to_timeslots(dates, edges, x)
     for slot in slots.values():
         print len(slot)
 
-    # x = slots.keys()
     citats = [len(slots[t]) for t in x]
     print citats
     print x
 
-    # x = [e.year for e in x]
     fig, ax = P.subplots()
     ax.xaxis_date()
     P.title("Nowe publikacje na kwartal")
     P.plot(x, citats, color='b', alpha=0.5, label="Nowe cytowania")
-    # P.bar(x, citats, align='center', color='b', alpha=0.5, label = "Nowe cytowania")
     ax.set_xticks(x)
     P.xticks(rotation=70)
-
-    # P.xticks(x)
 
     publications_per_slot = []
     for t in slots.keys():
         new_pubs = set([e[0] for e in slots[t]]) # unique
         publications_per_slot.append(len(new_pubs))
 
-    # P.bar(x, publications_per_slot, align="center", color="y", alpha=0.6, label="Nowe publikacje")
     P.plot(x, publications_per_slot, color="y", alpha=0.6, label="Nowe publikacje")
 
 
     P.legend(loc="upper left")
 
     P.show()
-
-    # P.figure()
-    #
-    # mu, sigma = 200, 25
-    # # x = mu + sigma*P.randn(10000)
-    # x = P.rand(10)*200
-    # bins = [100, 125, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 275, 300]
-    # n, bins, patches = P.hist(x)#, bins) #, bins, histtype='bar')
-    # P.show()
-
-
-    #
-    # mu, sigma = 200, 25
-    # x = mu + sigma*P.randn(10000)
-    #
-    # # the histogram of the data with histtype='step'
-    # n, bins, patches = P.hist(x, 50, normed=1, histtype='stepfilled')
-    # P.setp(patches, 'facecolor', 'g', 'alpha', 0.75)
-    #
-    # # add a line showing the expected distribution
-    # y = P.normpdf( bins, mu, sigma)
-    # l = P.plot(bins, y, 'k--', linewidth=1.5)
-    #
-    # #
-    # # create a histogram by providing the bin edges (unequally spaced)
-    # #
-    #
-    # P.figure()
-    #
-    # bins = [100,125,150,160,170,180,190,200,210,220,230,240,250,275,300]
-    # # the histogram of the data with histtype='step'
-    # n, bins, patches = P.hist(x, bins, normed=1, histtype='bar', rwidth=0.8)
-    #
-    # P.show()
 
 if __name__ == "__main__":
     plot_community_size_distribution()

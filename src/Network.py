@@ -1,6 +1,6 @@
 from __future__ import division
 from collections import defaultdict, Counter, deque
-from graph_tool import Graph
+from graph_tool import Graph, centrality
 import csv
 from itertools import product, combinations
 import graph_tool.topology as gt
@@ -192,6 +192,8 @@ class Network(object):
             for node, cbc in cnt.most_common():
                 print node, cbc/div
 
+    def get_outsiders(self):
+        pass
 
     def calculate_CBC(self, is_directed=True):
         """Calculate CBC for all nodes in network"""
@@ -225,12 +227,17 @@ class Network(object):
             v_lab = g.vp['label'][v]
 
             self.filter_community(communities[v_lab])
+            # node_betweenness, e_btwn= centrality.betweenness(g)
+            # v_betweenness = node_betweenness[v]
+            # betweenness = node_betweenness.get_array().tolist()
+            # avg_betweenness = sum(betweenness) / len(betweenness)
             v_degree =  v.out_degree()
             degrees = [i.out_degree() for i in g.vertices()]
             avg_degree = sum(degrees) / len(degrees)
             self.unfilter_graph()
 
             ratio = v_degree / avg_degree
+            # ratio = v_betweenness / avg_betweenness
             if ratio > 1:
                 print "Bloke: ", v_lab, ratio
 

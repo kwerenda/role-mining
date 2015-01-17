@@ -7,7 +7,7 @@ from collections import defaultdict
 class XNetwork(object):
     """Yet another Network class, this time based on NetworkX"""
     def __init__(self, edges_file, communities_file=None, use_communities=True):
-        self.graph = nx.read_edgelist(edges_file, create_using=nx.MultiGraph(), nodetype=int)
+        self.graph = nx.read_edgelist(edges_file, create_using=nx.DiGraph(), nodetype=int)
         if use_communities:
             self.communities = defaultdict(set)
             if communities_file:
@@ -17,14 +17,17 @@ class XNetwork(object):
 
 
     def create_communities(self, communities_list):
+        G = self.graph
+        for node in G.nodes():
+            G.add_node(node, comm=set())
 
-        for node in self.graph.nodes():
-            self.graph.add_node(node, comm=set())
-        # pprint(self.graph.nodes(data=True))
         for node, community in communities_list:
-            self.graph.node[node]['comm'].add(community)
+            G.node[node]['comm'].add(community)
             self.communities[community].add(node)
 
+    def get_community(self, comm):
+        nodes = self.communities[comm]
+        return self.graph.subgraph(nodes)
 
     def shortest_paths(self, v1, v2):
         try:

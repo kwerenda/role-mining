@@ -5,7 +5,7 @@ class TestXNetwork(TestCase):
 
     def test_multi(self):
         n = XNetwork("datasets/test/test_multi.edges", communities_file="datasets/test/test_cbc.communities")
-        self.assertEquals(n.graph.size(), 15)
+        self.assertEquals(n.graph.size(), 14)
         n.calculate_CBC()
         for node in n.graph.nodes():
             print node, n.graph.node[node]['cbc']
