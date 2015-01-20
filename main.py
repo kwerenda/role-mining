@@ -11,14 +11,14 @@ import pylab as P
 the_lads = ['jeff.dasovich@enron.com', 'mary.hain@enron.com', 'shelley.corman@enron.com', 'louise.kitchen@enron.com', 'a..shankman@enron.com', 'barry.tycholiz@enron.com', 'tana.jones@enron.com', 'john.arnold@enron.com', 'lavorato@enron.com', 'greg.whalley@enron.com', 'd..steffes@enron.com', 'e..haedicke@enron.com', 'stanley.horton@enron.com', 'richard.shapiro@enron.com', 'andy.zipper@enron.com', 'scott.neal@enron.com', 'kenneth.lay@enron.com', 'sally.beck@enron.com', 'john.griffith@enron.com', 'jonathan.mckay@enron.com', 'kimberly.watson@enron.com']
 the_losers = ['kam.keiser@enron.com', 'kevin.hyatt@enron.com', 'theresa.staab@enron.com', 'stephanie.panus@enron.com', 'mary.hain@enron.com', 'dan.hyvl@enron.com', 'lynn.blair@enron.com', 'kate.symes@enron.com', 'rosalee.fleming@enron.com', 'm..forney@enron.com', 'elizabeth.sager@enron.com', 'darrell.schoolcraft@enron.com', 'shelley.corman@enron.com', 'juan.hernandez@enron.com', 'joe.stepenovitch@enron.com', 'barry.tycholiz@enron.com', 'tori.kuykendall@enron.com', 'john.arnold@enron.com', 'susan.scott@enron.com', 'kay.mann@enron.com', 'drew.fossum@enron.com', 'jason.williams@enron.com', 'stanley.horton@enron.com', 'sara.shackleton@enron.com', 'michelle.lokay@enron.com', 'mark.mcconnell@enron.com', 'gerald.nemec@enron.com', 'debra.perlingiere@enron.com', 'mark.whitt@enron.com', 'cara.semperger@enron.com', 'charles.weldon@enron.com', 'errol.mclaughlin@enron.com', 'john.griffith@enron.com', 'chris.germany@enron.com', 'chris.dorland@enron.com', 'paul.y.barbo@enron.com', 'rick.buy@enron.com']
 
-superpapers = [9711165,9908142,9906064,9905111,0005016,5016,9711200,9802150,9802109,9905221,9711162,9803315]
+superpapers = [9711165, 9908142, 9906064, 9905111, 0005016, 5016, 9711200, 9802150, 9802109, 9905221, 9711162, 9803315]
 
 def get_leaders_and_outermosts():
     guys = Reader.read_lines("datasets/enron/enron_guys.txt")
     guys = {int(nid) : email for nid, email in guys}
 
     global_leaders, global_outermosts = defaultdict(list), defaultdict(list)
-    for month in xrange(1,13):
+    for month in xrange(1, 13):
         n = Network('datasets/enron/timeslots/{:02d}-filtered2.edges'.format(month),
                     is_directed=False,
                     use_communities=True)
@@ -60,7 +60,7 @@ def get_mediator_score_distribution():
     P.ylabel("Frequency")
     P.show()
 
-    important_emails = [
+    interesting_emails = [
         "jeff.dasovich@enron.com",
         "susan.scott@enron.com",
         "stanley.horton@enron.com",
@@ -109,7 +109,7 @@ def get_mediator_score_distribution():
         "michelle.lokay@enron.com",
         "paul.y.barbo@enron.com"
     ]
-    for email in important_emails:
+    for email in interesting_emails:
         try:
             print "{}\t{:.4f}".format(email, cbc_by_node[guys_by_email[email]])
         except KeyError:
@@ -122,34 +122,9 @@ def get_mediator_score_distribution():
     print "-----------------------------------"
     for n, cbc in nodes_with_cbc:
         i += 1
-        if guys[n] not in important_emails:
+        if guys[n] not in interesting_emails:
             print "{}\t{}\t{}\t{:.4f}".format(i, n, guys[n], cbc)
 
 if __name__ == '__main__':
-    # for year in xrange(1996, 1998):
-    #     n = XNetwork("datasets/hepth/timeslots/cit-HepTh-{}.edges".format(year),
-    #                  communities_file="datasets/hepth/communities/cit-HepTh-{}/k=3/directed_communities".format(year))
-    #
-    #     year_leaders, year_outermosts = [], []
-    #     for comm, node_set in n.communities.items():
-    #         group = n.get_community(comm)
-    #
-    #         if not 15 < len(node_set) < 500:
-    #             continue
-    #
-    #         pr = nx.pagerank(group)
-    #         src.Plotter.plot_fit_and_tails(pr.values(), "Pagerank distribution")
-    #         P.show()
-    #
-    #         leaders, outermosts = RoleMining.find_rolesX(group)
-    #
-    #         year_leaders.extend(leaders)
-    #         year_outermosts.extend(outermosts)
-    #
-    #     print
-    #     print "Year ", str(year)
-    #     year_outermosts.sort(key=lambda pair: pair[1])
-    #     for key, val in year_outermosts[:10]:
-    #         print key, val
-
-    get_leaders_and_outermosts()
+    get_mediator_score_distribution()
+    

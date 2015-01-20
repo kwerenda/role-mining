@@ -1,16 +1,13 @@
 from __future__ import division
 from collections import defaultdict, Counter, deque
-from graph_tool import Graph, centrality
-import csv
+from graph_tool import Graph
 from itertools import product, combinations
-import graph_tool.topology as gt
+import csv
 
 
 class Network(object):
     def __init__(self, edges_file, communities_file=None, k=3, is_directed=True, use_communities=False, cfinder=True):
         edges = self.read_file(edges_file)
-
-
 
         if use_communities and communities_file is None:
             path = edges_file.split('/')
@@ -19,7 +16,6 @@ class Network(object):
             k_folder = "k={}".format(k)
             cf_dir = '/'.join(path)
             communities = self.get_communities_from_cf(cf_dir + '/' + k_folder + '/directed_communities')
-            # self.communities = self.get_communities_from_cf('/'.join(path), k)
             self.communities = self.create_communities(communities)
         elif communities_file is not None:
             if cfinder:
@@ -31,17 +27,13 @@ class Network(object):
         filter_prop = g.new_vertex_property('bool')
         g.vertex_properties['filter'] = filter_prop
 
-        # self.create_communities(communities, g, label2index)
-
         self.graph = g
         self.label2index = label2index
-
 
     @classmethod
     def read_file(cls, filename):
         """Read file with pairs of ints into list of tuples"""
         pairs = []
-
         with open(filename, 'rb') as f:
             reader = csv.reader(f, delimiter='\t')
             for row in reader:
@@ -55,7 +47,6 @@ class Network(object):
     @classmethod
     def create_graph(cls, edges, is_directed=True):
         """Create a graph-tool type graph from a list of edges"""
-
         g = Graph()
         g.set_directed(is_directed)
         label2index = dict()
@@ -81,11 +72,8 @@ class Network(object):
 
     @classmethod
     def get_communities_from_cf(cls, filename):
-        # k_folder = "k={}".format(k)
-        # k_folder = 'k=4' if 'k=4' in listdir(cf_dir) else 'k=3'
+        """read communities from CFinder-style formatted  file as CFinder output"""
         tuples = []
-
-        # with open(cf_dir + '/' + k_folder + '/directed_communities') as f:
         with open(filename) as f:
             for line in f:
                 div = line.split(':')
@@ -96,7 +84,6 @@ class Network(object):
                 for n in nodes:
                     tuples.append((int(n), int(group)))
         return tuples
-
 
     @classmethod
     def create_communities(cls, communities_list):
@@ -111,7 +98,7 @@ class Network(object):
     def filter_community(self, community_labels):
         """Filter out one community from the graph"""
         g = self.graph
-        comm =self.communities
+        comm = self.communities
 
         for v in g.vertices():
             v_lab = g.vp['label'][v]
@@ -159,8 +146,8 @@ class Network(object):
 
         return paths
 
-    def get_mediators(self):
-        """Calculates and prints out (for now) NBC of the best nodes
+    def get_mediators_NBC(self):
+        """Calculates and prints out NBC of the best nodes
         in all community combinations"""
         communities = set(flatten_list(self.communities.values()))
         done = dict()
@@ -181,7 +168,6 @@ class Network(object):
                 else:
                     shortest = done[(v1, v2)] if (v1, v2) in done else done[(v2, v1)]
                     cpaths.extend(shortest)
-
             flatlist = []
             for l in cpaths:
                 flatlist.extend(l[1:-1])
@@ -190,27 +176,18 @@ class Network(object):
             print "Groups: ", c1, c2  # to be replaced if this function has some future
             print "id score"
             for node, cbc in cnt.most_common():
-                print node, cbc/div
-
-    def get_outsiders(self):
-        pass
+                print node, cbc / div
 
     def calculate_CBC(self, is_directed=True):
         """Calculate CBC for all nodes in network"""
 
         cdc = self.graph.new_vertex_property('int32_t')
         self.graph.vertex_properties['CDC'] = cdc
-        #set all to 0
         for v in self.graph.vertices():
-                self.graph.vp['CDC'][v] = 0
-
-        # dla kazdej pary wezlow w grafie - kolejnosc ma znaczenie
+            self.graph.vp['CDC'][v] = 0
         for v1, v2 in product(self.graph.vertices(), self.graph.vertices()):
             v1_lab, v2_lab = self.label2index[v1], self.label2index[v2]
-
-            # jezeli community (c1) != commmunity (C2)
             if set(self.communities[v1_lab]).isdisjoint(set(self.communities[v2_lab])):
-                #   dla kazdej najkrotszej sciezki p od c1 do c2
                 for path in self.shortest_paths(v1, v2):
                     for v in path:
                         self.graph.vp['CDC'][v] += 1
@@ -220,6 +197,7 @@ class Network(object):
                 self.graph.vp['CDC'][v] /= 2
 
     def get_wannabe_mediators(self):
+        """Get all mediators candidates"""
         g, communities = self.graph, self.communities
         bigrouped = [v for v in g.vertices() if len(communities[g.vp['label'][v]]) > 1]
 
@@ -231,7 +209,7 @@ class Network(object):
             # v_betweenness = node_betweenness[v]
             # betweenness = node_betweenness.get_array().tolist()
             # avg_betweenness = sum(betweenness) / len(betweenness)
-            v_degree =  v.out_degree()
+            v_degree = v.out_degree()
             degrees = [i.out_degree() for i in g.vertices()]
             avg_degree = sum(degrees) / len(degrees)
             self.unfilter_graph()
@@ -240,8 +218,6 @@ class Network(object):
             # ratio = v_betweenness / avg_betweenness
             if ratio > 1:
                 print "Bloke: ", v_lab, ratio
-
-
 
 def flatten_list(l):
     return [item for sublist in l for item in sublist]

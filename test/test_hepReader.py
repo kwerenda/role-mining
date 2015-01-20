@@ -35,11 +35,3 @@ class TestHepReader(TestCase):
     def test_date_from_id_regular(self):
         self.assertEqual(HepReader._date_from_id("212999"), date(2002, 12, 01))
 
-    # def test_clean_data(self):
-    #     self.fail()
-    #
-    # def test_read_dates(self):
-    #     self.fail()
-    #
-    # def test_read_edges(self):
-    #     self.fail()

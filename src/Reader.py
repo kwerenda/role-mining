@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
-
-
 from datetime import date, datetime
 from itertools import chain
 from collections import defaultdict
 
+
 def read_lines(filename):
-        with open(filename) as f:
+    """Parse file into list of tuples, ignore comments"""
+    with open(filename) as f:
             return [line.strip().split() for line in f.readlines() if not line.startswith('#') and not len(line) == 0]
 
 
 def read_int_lines(filename):
+    """Parse file into list of integer tuples, ignore comments"""
     return [[int(e) for e in x.split()] for x in read_lines(filename)]
+
 
 class Node(object):
     def __init__(self, nid, ndate, communities):
@@ -22,7 +24,6 @@ class Node(object):
 
 
 class EnronReader(object):
-
     def __init__(self, filename, with_days=True):
         self.edges_with_days = read_int_lines(filename)
         self.daysets = defaultdict(set)
@@ -44,18 +45,6 @@ class EnronReader(object):
             for sender, receiver in self.edges:
                 fout.write("{:05d}\t{:05d}\n".format(sender, receiver))
 
-        # if write_to_file:
-        #     for year in slots:
-        #         with open(base_filename.replace('.txt', '-{}.edges'.format(year.year)), 'w') as fout:
-        #             for edge in slots[year]:
-        #                 fout.write("{:07d}\t{:07d}\n".format(edge[0], edge[1]))
-        #                 lines += 1
-        #     print "Lines written", lines
-        # return slots
-
-
-
-
 
 class HepReader(object):
     def __init__(self, filename_edges, filename_dates, filename_communities):
@@ -68,7 +57,6 @@ class HepReader(object):
         pass
 
     DATE_FORMAT = '%Y-%m-%d'
-
 
     def get_edges(self):
         return self.edges
@@ -84,15 +72,14 @@ class HepReader(object):
 
     @staticmethod
     def get_for_year(year):
+        """utility method for extracting data for one whole year"""
         return HepReader("datasets/hepth/timeslots/cit-HepTh-{}.edges".format(year),
                    "datasets/hepth/cit-HepTh.dates",
                    "datasets/hepth/communities/cit-HepTh-{}.communities".format(year))
 
-
-
-
     @staticmethod
     def _date_from_id(node_id):
+        """extract date from node id"""
         node_id = str(node_id).zfill(7)
         year = int(node_id[:2])
         year = 1900 + year if year > 20 else 2000 + year
@@ -194,7 +181,6 @@ class HepReader(object):
         return new_nodes_filename
 
 
-
     @classmethod
     def read_dates(cls, filename_dates):
         """Read nodes with dates from file as dict: {node_id : date}"""
@@ -232,7 +218,8 @@ class HepReader(object):
         return communities
 
 
-    def split_to_timeslots(self,timeslots):
+    def split_to_timeslots(self, timeslots):
+        """Split data into arbitrary timeslots"""
         slots = defaultdict(list)  # {slot : [edges]}
         for edge in self.edges:
             date_e = self.dates[edge[0]]

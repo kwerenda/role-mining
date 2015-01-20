@@ -1,11 +1,10 @@
 import networkx as nx
 from itertools import combinations
 from Network import Network
-from pprint import pprint
 from collections import defaultdict
 
 class XNetwork(object):
-    """Yet another Network class, this time based on NetworkX"""
+    """Network implementation based on NetworkX framework"""
     def __init__(self, edges_file, communities_file=None, use_communities=True):
         self.graph = nx.read_edgelist(edges_file, create_using=nx.DiGraph(), nodetype=int)
         if use_communities:
@@ -13,8 +12,6 @@ class XNetwork(object):
             if communities_file:
                 comms = Network.get_communities_from_cf(communities_file)
                 self.create_communities(comms)
-
-
 
     def create_communities(self, communities_list):
         G = self.graph

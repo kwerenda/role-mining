@@ -26,7 +26,6 @@ class RoleMining(object):
             label = g.vp['label'][v]
             if communities[label] == []:
                 outsiders.append(label)
-
         return outsiders
 
 
@@ -37,7 +36,6 @@ class RoleMining(object):
         for v in g.vertices():
             if not isnan(closeness[v]) and closeness[v] >= threshold:
                 leaders.append((g.vp['label'][v], closeness[v]))
-
         return leaders
 
 
@@ -50,8 +48,8 @@ class RoleMining(object):
                 outermosts.append((g.vp['label'][v], closeness[v]))
         return outermosts
 
-
     def find_roles(self):
+        """Compute mediators, outsermosts and leaders"""
         g = self.network.graph
         # outsiders = self.find_outsiders()
         closeness_pm = centrality.closeness(g)
